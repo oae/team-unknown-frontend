@@ -34,6 +34,18 @@
             android:windowSoftInputMode="adjustPan">
         </activity>
 
+        <activity android:name=".controller.MainActivity">
+
+        </activity>
+
+        <activity
+            android:name=".controller.AccountRegisterActivity"
+            android:label="@string/sign_up"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".controller.LoginActivity" />
+        </activity>
 
         <activity android:name=".controller.MainActivity">
 
