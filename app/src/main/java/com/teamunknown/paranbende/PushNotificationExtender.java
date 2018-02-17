@@ -23,7 +23,7 @@ public class PushNotificationExtender extends NotificationExtenderService
     @Override
     protected boolean onNotificationProcessing(OSNotificationReceivedResult receivedResult)
     {
-        String userId = PreferencesPB.getValue("userId");
+        String userId = PreferencesPB.getValue(GeneralValues.LOGIN_USER_ID);
         try
         {
             if(userId.equals(receivedResult.payload.additionalData.getString("userId")) || true)

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
@@ -72,7 +73,6 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     private JSONObject requestBody;
 
 
-
     @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -122,12 +122,13 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         });
 
 
-        ArrayAdapter dataAdapter = new ArrayAdapter(this,android.R.layout.simple_spinner_item, list);
+        ArrayAdapter dataAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, list);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mUserTypeSpinner.setAdapter(dataAdapter);
 
 
     }
+
 
     private void attemptLogin() throws JSONException {
         boolean mCancel = this.logInValidation();
@@ -183,15 +184,18 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
                                 PreferencesPB.setValue(GeneralValues.LOGIN_USER_NAME, mUser.getEmail());
                                 PreferencesPB.setValue(GeneralValues.LOGIN_ACCESS_TOKEN, mData.getToken());
-                                PreferencesPB.setValue(GeneralValues.LOGIN_USER_ID,mUser.getId());
-                                Intent intent;
-                                if (!(null ==selectedItem) && PreferencesPB.getValue(GeneralValues.LOGIN_USER_TYPE)=="Taker"){
-                                     intent = new Intent(LoginActivity.this, TakerActivity.class);
+                                PreferencesPB.setValue(GeneralValues.LOGIN_USER_ID, mUser.getId());
+                                Intent intent = null;
+                                if (PreferencesPB.checkPreferencesWhetherTheValueisExistorNot(GeneralValues.LOGIN_USER_TYPE)){
+                                    if (PreferencesPB.getValue(GeneralValues.LOGIN_USER_TYPE) == "Taker") {
+                                        intent = new Intent(LoginActivity.this, TakerActivity.class);
+                                    } else {
+                                        intent = new Intent(LoginActivity.this, MakerActivity.class);
+                                    }
                                 }
                                 else {
                                     intent = new Intent(LoginActivity.this, MakerActivity.class);
                                 }
-
                                 startActivity(intent);
                                 LoginActivity.this.finish();
                                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -262,7 +266,14 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
     private void checkUserLogInStatus() {
         if (PreferencesPB.checkPreferencesWhetherTheValueisExistorNot(GeneralValues.LOGIN_USER_NAME)) {
-            Intent intent = new Intent(LoginActivity.this, TakerActivity.class);
+            Intent intent;
+            if (PreferencesPB.checkPreferencesWhetherTheValueisExistorNot(GeneralValues.LOGIN_USER_TYPE) &&
+                    PreferencesPB.getValue(GeneralValues.LOGIN_USER_TYPE)=="Taker"){
+                intent = new Intent(LoginActivity.this, TakerActivity.class);
+            }
+            else {
+                intent = new Intent(LoginActivity.this, MakerActivity.class);
+            }
             LoginActivity.this.finish();
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
@@ -282,7 +293,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {
         selectedItem = parent.getItemAtPosition(position).toString();
-        PreferencesPB.setValue(GeneralValues.LOGIN_USER_TYPE,selectedItem);
+        PreferencesPB.setValue(GeneralValues.LOGIN_USER_TYPE, selectedItem);
     }
 
     @Override
