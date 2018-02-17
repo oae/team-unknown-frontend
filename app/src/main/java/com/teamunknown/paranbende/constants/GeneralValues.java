@@ -1,4 +1,4 @@
-package com.teamunknown.paranbende;
+package com.teamunknown.paranbende.constants;
 
 /**
  * Created by halitogunc on 17.02.2018.

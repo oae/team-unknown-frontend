@@ -6,15 +6,12 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -22,8 +19,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.teamunknown.paranbende.GeneralValues;
-import com.teamunknown.paranbende.MakerActivity;
+import com.teamunknown.paranbende.constants.GeneralValues;
 import com.teamunknown.paranbende.R;
 import com.teamunknown.paranbende.RestInterfaceController;
 import com.teamunknown.paranbende.model.Data;
@@ -48,7 +44,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
  * Created by halitogunc on 17.02.2018.
  */
 
-public class LoginActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class LoginActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     private static final String TAG = LoginActivity.class.getSimpleName();
 
@@ -121,10 +117,11 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
             }
         });
 
-
         ArrayAdapter dataAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, list);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mUserTypeSpinner.setAdapter(dataAdapter);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mUserTypeSpinner.setOnItemSelectedListener(this);
+
 
 
     }
@@ -186,7 +183,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                                 PreferencesPB.setValue(GeneralValues.LOGIN_USER_ID, mUser.getId());
                                 Intent intent = null;
                                 if (PreferencesPB.checkPreferencesWhetherTheValueisExistorNot(GeneralValues.LOGIN_USER_TYPE)){
-                                    if (PreferencesPB.getValue(GeneralValues.LOGIN_USER_TYPE) == "Taker") {
+                                    if (PreferencesPB.getValue(GeneralValues.LOGIN_USER_TYPE).equals("Taker")) {
                                         intent = new Intent(LoginActivity.this, TakerActivity.class);
                                     } else {
                                         intent = new Intent(LoginActivity.this, MakerActivity.class);
@@ -267,7 +264,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         if (PreferencesPB.checkPreferencesWhetherTheValueisExistorNot(GeneralValues.LOGIN_USER_NAME)) {
             Intent intent;
             if (PreferencesPB.checkPreferencesWhetherTheValueisExistorNot(GeneralValues.LOGIN_USER_TYPE) &&
-                    PreferencesPB.getValue(GeneralValues.LOGIN_USER_TYPE)=="Maker"){
+                    PreferencesPB.getValue(GeneralValues.LOGIN_USER_TYPE).equals("Maker")){
                 intent = new Intent(LoginActivity.this, MakerActivity.class);
             }
             else {
@@ -299,5 +296,6 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
+
 }
 

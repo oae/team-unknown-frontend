@@ -1,11 +1,13 @@
 package com.teamunknown.paranbende;
 
+import com.teamunknown.paranbende.model.Settings.UserSettings.UserSettingsModel;
 import com.teamunknown.paranbende.model.UserLoginModel;
 import com.teamunknown.paranbende.model.WithdrawalModel;
 
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
@@ -30,6 +32,15 @@ public interface RestInterfaceController {
     @Headers("Content-Type: application/json")
     @POST("/taker/create-withdrawal")
     Call<WithdrawalModel> createWithdrawal(@Header("Authorization") String authorization, @Body String body);
+
+    /* get settings */
+    @GET("/user/get")
+    Call<UserSettingsModel> getUserSettings(@Header("Authorization") String authorization);
+
+    /* save settings */
+    @Headers("Content-Type: application/json")
+    @POST("/maker/save-settings")
+    Call<UserSettingsModel> saveUserSettings(@Header("Authorization") String authorization, @Body String body);
 
 
 

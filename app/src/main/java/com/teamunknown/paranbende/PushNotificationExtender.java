@@ -2,14 +2,12 @@ package com.teamunknown.paranbende;
 
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import com.onesignal.NotificationExtenderService;
 import com.onesignal.OSNotificationReceivedResult;
 
 import com.teamunknown.paranbende.constants.CommonConstants;
-import com.teamunknown.paranbende.helpers.CheckAppIsRunning;
-import com.teamunknown.paranbende.helpers.MapHelper;
+import com.teamunknown.paranbende.constants.GeneralValues;
 import com.teamunknown.paranbende.util.PreferencesPB;
 
 import org.json.JSONException;

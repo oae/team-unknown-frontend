@@ -2,13 +2,11 @@ package com.teamunknown.paranbende;
 
 import android.content.Intent;
 
-import com.onesignal.OSNotificationAction;
 import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OneSignal;
 import com.teamunknown.paranbende.constants.CommonConstants;
 import com.teamunknown.paranbende.controller.BaseApplication;
-
-import org.json.JSONObject;
+import com.teamunknown.paranbende.controller.MakerActivity;
 
 /**
  * Created by msalihkarakasli on 17.02.2018.

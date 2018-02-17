@@ -15,7 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.teamunknown.paranbende.GeneralValues;
+import com.teamunknown.paranbende.constants.GeneralValues;
 import com.teamunknown.paranbende.R;
 import com.teamunknown.paranbende.RestInterfaceController;
 import com.teamunknown.paranbende.model.UserLoginModel;

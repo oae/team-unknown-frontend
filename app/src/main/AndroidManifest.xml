@@ -67,7 +67,7 @@
 
 
         <activity
-            android:name=".MakerActivity"
+            android:name=".controller.MakerActivity"
             android:theme="@style/AppTheme">
 
         </activity>
