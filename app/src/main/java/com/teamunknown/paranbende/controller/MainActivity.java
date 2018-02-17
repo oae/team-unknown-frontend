@@ -1,4 +1,4 @@
-package com.teamunknown.paranbende;
+package com.teamunknown.paranbende.controller;
 
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.teamunknown.paranbende.R;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
