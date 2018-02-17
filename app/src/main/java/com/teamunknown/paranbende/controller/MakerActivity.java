@@ -22,11 +22,14 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.koushikdutta.async.http.AsyncHttpClient;
+import com.koushikdutta.async.http.WebSocket;
 import com.teamunknown.paranbende.BaseMapActivity;
 import com.teamunknown.paranbende.R;
 import com.teamunknown.paranbende.RestInterfaceController;
 import com.teamunknown.paranbende.constants.CommonConstants;
 import com.teamunknown.paranbende.constants.GeneralValues;
+import com.teamunknown.paranbende.helpers.RequestHelper;
 import com.teamunknown.paranbende.model.Settings.SettingsDataModel;
 import com.teamunknown.paranbende.model.Settings.SettingsMaker;
 import com.teamunknown.paranbende.model.Settings.SettingsModel;
@@ -39,6 +42,7 @@ import com.teamunknown.paranbende.model.WithdrawalTakerModel;
 import com.teamunknown.paranbende.util.Helper;
 import com.teamunknown.paranbende.util.PreferencesPB;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -53,6 +57,8 @@ public class MakerActivity extends BaseMapActivity {
     // Keys for storing activity state.
     DrawerLayout drawer;
     private Toolbar toolbar;
+
+    WebSocket mWebSocket;
 
     private SettingsDataModel mSettingsDataModel;
     private SettingsMaker mSettingsMaker;
@@ -91,7 +97,6 @@ public class MakerActivity extends BaseMapActivity {
         drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
-
         toggle.syncState();
 
         ImageView iToggleBtn = findViewById(R.id.iMenuToggle);
@@ -149,13 +154,8 @@ public class MakerActivity extends BaseMapActivity {
     }
 
     private void saveSettings() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(GeneralValues.BASE_URL)
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
 
-        serviceAPI = retrofit.create(RestInterfaceController.class);
+        serviceAPI = RequestHelper.createServiceAPI();
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.loading));
@@ -212,13 +212,8 @@ public class MakerActivity extends BaseMapActivity {
     }
 
     private void getUserSettings() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(GeneralValues.BASE_URL)
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
 
-        serviceAPI = retrofit.create(RestInterfaceController.class);
+        serviceAPI = RequestHelper.createServiceAPI();
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.loading));
@@ -269,8 +264,19 @@ public class MakerActivity extends BaseMapActivity {
     }
 
     @Override
-    protected void updateObjectsOnMap(double latitude, double longitude, int zoomLevel) {
-        return;
+    protected void updateObjectsOnMap(double latitude,double longitude,int zoomLevel)
+    {
+        if (mWebSocket != null)
+        {
+            try
+            {
+                mWebSocket.send(createUpdateLocationMessage());
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -283,7 +289,8 @@ public class MakerActivity extends BaseMapActivity {
         }
     }
 
-    private void createWitdrawEventDialog(String message) {
+    private void createWitdrawEventDialog(String message)
+    {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MakerActivity.this);
         dialogBuilder.setTitle("Yeni bir işlem için onayınız bekleniyor!");
         dialogBuilder.setMessage(message);
@@ -293,7 +300,10 @@ public class MakerActivity extends BaseMapActivity {
                 getResources().getString(R.string.accept),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
+
+                        // TODO: Sent accept request to for withdrawal.
+                        // Start to web socket connection to sent own location.
+                        connectWebSocket();
                     }
                 });
 
@@ -301,12 +311,110 @@ public class MakerActivity extends BaseMapActivity {
                 getResources().getString(R.string.reject),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+
+                        // TODO: Sent reject request to for withdrawal.
                         dialog.cancel();
                     }
                 });
 
         AlertDialog dialogBox = dialogBuilder.create();
         dialogBox.show();
+    }
+
+    private void connectWebSocket()
+    {
+        AsyncHttpClient.getDefaultInstance().websocket("ws://lab.nepjua.org:23000", null, new AsyncHttpClient.WebSocketConnectCallback() {
+            @Override
+            public void onCompleted(Exception ex, WebSocket webSocket) {
+                if (ex != null) {
+                    ex.printStackTrace();
+                    return;
+                }
+
+                mWebSocket = webSocket;
+
+                try
+                {
+                    webSocket.send(createUpdateLocationMessage());
+                }
+                catch (JSONException e)
+                {
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        });
+    }
+
+    private String createUpdateLocationMessage() throws JSONException
+    {
+        if (mLastKnownLocation == null)
+        {
+            return createLocationUpdateErrorMessage();
+        }
+        JSONObject mainRequestObject = new JSONObject();
+
+        mainRequestObject.put("type", "method");
+        mainRequestObject.put("method", "update-location");
+
+        JSONObject payloadObject = new JSONObject();
+        payloadObject.put("id", "test1");
+
+        JSONArray locationArray = new JSONArray();
+        locationArray.put(mLastKnownLocation.getLatitude());
+        locationArray.put(mLastKnownLocation.getLongitude());
+
+        payloadObject.put("loc", locationArray);
+
+        mainRequestObject.put("payload", payloadObject);
+
+        return mainRequestObject.toString();
+    }
+
+    private String createLocationUpdateErrorMessage() throws JSONException
+    {
+        JSONObject mainRequestObject = new JSONObject();
+
+        mainRequestObject.put("type", "error");
+
+        JSONObject payloadObject = new JSONObject();
+        payloadObject.put("name", "LocationUpdateFail");
+
+        mainRequestObject.put("payload", payloadObject);
+
+        return mainRequestObject.toString();
+    }
+
+    private boolean parseSocketMessage(String s) throws JSONException
+    {
+        if ("".equals(s))
+        {
+            return false;
+        }
+
+        JSONObject mainObject = new JSONObject(s);
+
+        String actionType = mainObject.getString("type");
+        JSONObject payloadObject = mainObject.getJSONObject("payload");
+
+        if (CommonConstants.ACTION_START.equals(actionType))
+        {
+
+        }
+        else if (CommonConstants.ACTION_LOCATION_UPDATE.equals(actionType))
+        {
+
+        }
+        else if (CommonConstants.ACTION_END.equals(actionType))
+        {
+
+        }
+        else
+        {
+
+        }
+
+        return true;
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
