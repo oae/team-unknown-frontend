@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -22,7 +23,12 @@ import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -31,6 +37,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -47,12 +54,15 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
     protected CameraPosition mCameraPosition;
     protected Location mLastKnownLocation;
     private ImageView locationUpdateIV;
+    private Marker currentMarker;
+    LocationRequest mLocationRequest;
+    private LocationCallback mLocationCallback;
 
-    protected static final String KEY_CAMERA_POSITION   = MapConstants.KEY_CAMERA_POSITION;
-    protected static final String KEY_LOCATION          = MapConstants.KEY_LOCATION;
-    protected static final int DEFAULT_ZOOM             = MapConstants.DEFAULT_ZOOM;
-    protected static final String TAG                   = MakerActivity.class.getSimpleName();
-    protected static final int ACCESS_FINE_LOCATION     = 1;
+    protected static final String KEY_CAMERA_POSITION = MapConstants.KEY_CAMERA_POSITION;
+    protected static final String KEY_LOCATION = MapConstants.KEY_LOCATION;
+    protected static final int DEFAULT_ZOOM = MapConstants.DEFAULT_ZOOM;
+    protected static final String TAG = MakerActivity.class.getSimpleName();
+    protected static final int ACCESS_FINE_LOCATION = 1;
 
     protected final LatLng mDefaultLocation = new LatLng(41.0288058, 29.1154325);
 
@@ -63,20 +73,90 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
 
     private ActionBar toolbar;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null)
+        {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
 
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(5000);
+        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        mLocationCallback = new LocationCallback()
+        {
+            @Override
+            public void onLocationResult(LocationResult locationResult)
+            {
+                mLastKnownLocation = locationResult.getLastLocation();
+
+                if (null == currentMarker)
+                {
+                    return;
+                }
+
+                currentMarker.remove();
+
+                currentMarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(MapHelper.getMarkerBitmapFromView(BaseMapActivity.this, R.drawable.ic_men_web))).position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())));
+
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+
+                updateObjectsOnMap(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), DEFAULT_ZOOM);
+            }
+
+            ;
+        };
+
+
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            return;
+        }
+        mFusedLocationProviderClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
 
+        toolbar = getSupportActionBar();
 
+        mLocationCallback = new LocationCallback()
+        {
+            @Override
+            public void onLocationResult(LocationResult locationResult)
+            {
+                mLastKnownLocation = locationResult.getLastLocation();
+
+                if (null == currentMarker)
+                {
+                    return;
+                }
+
+                currentMarker.remove();
+
+                currentMarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(MapHelper.getMarkerBitmapFromView(BaseMapActivity.this, R.drawable.ic_men_web))).position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())));
+
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+
+                updateObjectsOnMap(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), DEFAULT_ZOOM);
+            }
+
+            ;
+        };
+
+        // Construct a FusedLocationProviderClient.
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            return;
+        }
+
+        mFusedLocationProviderClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
     }
 
     public void setMapFragment()
@@ -107,15 +187,14 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
-                            updateLocationOnMap(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude(),DEFAULT_ZOOM);
-                            mMap.addMarker(new MarkerOptions()
-                                    .title("Test")
+                            //updateLocationOnMap(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude(),DEFAULT_ZOOM);
+                            currentMarker = mMap.addMarker(new MarkerOptions()
                                     .icon(BitmapDescriptorFactory.fromBitmap(MapHelper.getMarkerBitmapFromView(BaseMapActivity.this, R.drawable.ic_men_web)))
                                     .position(new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude())));
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
-                            updateLocationOnMap(mDefaultLocation.latitude,mDefaultLocation.longitude,DEFAULT_ZOOM);
+                            //updateLocationOnMap(mDefaultLocation.latitude,mDefaultLocation.longitude,DEFAULT_ZOOM);
                         }
                     }
                 });
@@ -130,13 +209,6 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
     }
 
     protected abstract void updateObjectsOnMap(double latitude,double longitude,int zoomLevel);
-
-    private void updateLocationOnMap(double latitude,double longitude,int zoomLevel) {
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(latitude,longitude), zoomLevel));
-
-        updateObjectsOnMap(latitude, longitude, zoomLevel);
-    }
 
     protected void getLocationPermission() {
         /*
@@ -168,10 +240,15 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
         }
     }
 
+    public void changeLocation(Location location)
+    {
+        //updateLocationOnMap(location.getLatitude(),location.getLongitude(), DEFAULT_ZOOM);
 
-    /**
-     * Handles the result of the request for location permissions.
-     */
+    }
+
+        /**
+         * Handles the result of the request for location permissions.
+         */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
@@ -189,7 +266,6 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
                     Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
                     finishAffinity();
                 }
-
             }
         }
         updateLocationUI();
@@ -207,6 +283,7 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
                 }
             });
         }
+
 
         @SuppressLint("ResourceType") View myLocationButton = mapFragment.getView().findViewById(0x2);
         //myLocationButton.setBackground(getDrawable(R.drawable.));

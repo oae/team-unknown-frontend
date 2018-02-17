@@ -20,12 +20,19 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.koushikdutta.async.http.AsyncHttpClient;
+import com.koushikdutta.async.http.WebSocket;
 import com.teamunknown.paranbende.constants.CommonConstants;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MakerActivity extends BaseMapActivity
 {
-    // Keys for storing activity state.
     DrawerLayout drawer;
+    WebSocket mWebSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -103,10 +110,21 @@ public class MakerActivity extends BaseMapActivity
         }
     }
 
+
     @Override
     protected void updateObjectsOnMap(double latitude,double longitude,int zoomLevel)
     {
-        return;
+        if (mWebSocket != null)
+        {
+            try
+            {
+                mWebSocket.send(createUpdateLocationMessage());
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -134,7 +152,11 @@ public class MakerActivity extends BaseMapActivity
                 getResources().getString(R.string.accept),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
+
+                        // TODO: Sent accept request to for withdrawal.
+
+                        // Start to web socket connection to sent own location.
+                        connectWebSocket();
                     }
                 });
 
@@ -142,12 +164,110 @@ public class MakerActivity extends BaseMapActivity
                 getResources().getString(R.string.reject),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+
+                        // TODO: Sent reject request to for withdrawal.
                         dialog.cancel();
                     }
                 });
 
         AlertDialog dialogBox = dialogBuilder.create();
         dialogBox.show();
+    }
+
+    private void connectWebSocket()
+    {
+        AsyncHttpClient.getDefaultInstance().websocket("ws://lab.nepjua.org:23000", null, new AsyncHttpClient.WebSocketConnectCallback() {
+            @Override
+            public void onCompleted(Exception ex, WebSocket webSocket) {
+                if (ex != null) {
+                    ex.printStackTrace();
+                    return;
+                }
+
+                mWebSocket = webSocket;
+
+                try
+                {
+                    webSocket.send(createUpdateLocationMessage());
+                }
+                catch (JSONException e)
+                {
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        });
+    }
+
+    private String createUpdateLocationMessage() throws JSONException
+    {
+        if (mLastKnownLocation == null)
+        {
+            return createLocationUpdateErrorMessage();
+        }
+        JSONObject mainRequestObject = new JSONObject();
+
+        mainRequestObject.put("type", "method");
+        mainRequestObject.put("method", "update-location");
+
+        JSONObject payloadObject = new JSONObject();
+        payloadObject.put("id", "test1");
+
+        JSONArray locationArray = new JSONArray();
+        locationArray.put(mLastKnownLocation.getLatitude());
+        locationArray.put(mLastKnownLocation.getLongitude());
+
+        payloadObject.put("loc", locationArray);
+
+        mainRequestObject.put("payload", payloadObject);
+
+        return mainRequestObject.toString();
+    }
+
+    private String createLocationUpdateErrorMessage() throws JSONException
+    {
+        JSONObject mainRequestObject = new JSONObject();
+
+        mainRequestObject.put("type", "error");
+
+        JSONObject payloadObject = new JSONObject();
+        payloadObject.put("name", "LocationUpdateFail");
+
+        mainRequestObject.put("payload", payloadObject);
+
+        return mainRequestObject.toString();
+    }
+
+    private boolean parseSocketMessage(String s) throws JSONException
+    {
+        if ("".equals(s))
+        {
+            return false;
+        }
+
+        JSONObject mainObject = new JSONObject(s);
+
+        String actionType = mainObject.getString("type");
+        JSONObject payloadObject = mainObject.getJSONObject("payload");
+
+        if (CommonConstants.ACTION_START.equals(actionType))
+        {
+
+        }
+        else if (CommonConstants.ACTION_LOCATION_UPDATE.equals(actionType))
+        {
+
+        }
+        else if (CommonConstants.ACTION_END.equals(actionType))
+        {
+
+        }
+        else
+        {
+
+        }
+
+        return true;
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
