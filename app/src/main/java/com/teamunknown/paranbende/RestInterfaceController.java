@@ -43,7 +43,10 @@ public interface RestInterfaceController {
     @POST("/maker/save-settings")
     Call<SettingsModel> saveUserSettings(@Header("Authorization") String authorization, @Body String body);
 
-
+    /* confirm withdrawal */
+    @Headers("Content-Type: application/json")
+    @POST("/maker/confirm-withdrawal")
+    Call<WithdrawalModel> confirmWithdrawal(@Header("Authorization") String authorization, @Body String body);
 
 
 

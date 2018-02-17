@@ -50,6 +50,7 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
     protected Location mLastKnownLocation;
     private ImageView locationUpdateIV;
     private Marker currentMarker;
+    private Marker takerMarker;
     LocationRequest mLocationRequest;
     private LocationCallback mLocationCallback;
 
@@ -303,5 +304,13 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
 
             myLocationButton.setLayoutParams(params);
         }
+    }
+
+    protected void addTakerMarker(double lat, double lng)
+    {
+        takerMarker = mMap.addMarker(
+                new MarkerOptions()
+                        .icon(BitmapDescriptorFactory.fromBitmap(MapHelper.getMarkerBitmapFromView(BaseMapActivity.this, R.drawable.ic_men_web)))
+                        .position(new LatLng(lat, lng)));
     }
 }

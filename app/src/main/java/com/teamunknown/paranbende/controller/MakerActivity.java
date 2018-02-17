@@ -46,6 +46,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -66,6 +68,8 @@ public class MakerActivity extends BaseMapActivity {
     private UserSettingsModel mUserSettingsModel;
     private UserSettingsMaker mUserSettingsMaker;
     private UserSettingsData mUserSettingsData;
+    private WithdrawalModel mWithdrawalModel;
+    private WithdrawalDataModel mWithdrawalDataModel;
 
     private ProgressDialog progressDialog;
 
@@ -145,11 +149,12 @@ public class MakerActivity extends BaseMapActivity {
         mMaxAmountEditText = findViewById(R.id.e_max_amount);
         mDistanceEditText = findViewById(R.id.e_distance);
 
+        if (CommonConstants.FROM_PUSH_NOTIFICATION.equals(whereFrom))
+        {
+            String message = getIntent().getExtras().getString(CommonConstants.MESSAGE);
+            String withdrawalId = getIntent().getExtras().getString(CommonConstants.WITHDRAWAL);
 
-
-        if (CommonConstants.FROM_PUSH_NOTIFICATION.equals(whereFrom)) {
-            String message = getIntent().getExtras().getString("message");
-            createWitdrawEventDialog(message);
+            createWitdrawEventDialog(message, withdrawalId);
         }
     }
 
@@ -289,7 +294,7 @@ public class MakerActivity extends BaseMapActivity {
         }
     }
 
-    private void createWitdrawEventDialog(String message)
+    private void createWitdrawEventDialog(String message, final String withdrawalId)
     {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MakerActivity.this);
         dialogBuilder.setTitle("Yeni bir işlem için onayınız bekleniyor!");
@@ -300,8 +305,7 @@ public class MakerActivity extends BaseMapActivity {
                 getResources().getString(R.string.accept),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-
-                        // TODO: Sent accept request to for withdrawal.
+                        createConfirmWithdrawalRequest(true, withdrawalId);
                         // Start to web socket connection to sent own location.
                         connectWebSocket();
                     }
@@ -311,14 +315,79 @@ public class MakerActivity extends BaseMapActivity {
                 getResources().getString(R.string.reject),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-
-                        // TODO: Sent reject request to for withdrawal.
+                        createConfirmWithdrawalRequest(false, withdrawalId);
                         dialog.cancel();
                     }
                 });
 
         AlertDialog dialogBox = dialogBuilder.create();
         dialogBox.show();
+    }
+
+    private void createConfirmWithdrawalRequest(Boolean isApproved, String withdrawalId)
+    {
+        serviceAPI = RequestHelper.createServiceAPI();
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getString(R.string.loading));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        try
+        {
+            JSONObject json = new JSONObject();
+            json.put("isApproved", isApproved);
+            json.put("withdrawalId", withdrawalId);
+            requestBody = json;
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+            Log.e(TAG, "JSON Exception");
+        }
+
+        retrofit2.Call<WithdrawalModel> call = serviceAPI.confirmWithdrawal("Bearer " + PreferencesPB.getValue(GeneralValues.LOGIN_ACCESS_TOKEN), requestBody.toString());
+        call.enqueue(new Callback<WithdrawalModel>() {
+            @Override
+            public void onResponse(Call<WithdrawalModel> call, Response<WithdrawalModel> response) {
+                try {
+                    int code = response.code();
+                    mWithdrawalModel = new WithdrawalModel();
+                    mWithdrawalDataModel = new WithdrawalDataModel();
+
+                    if (code == 200) {
+                        if (!(response.body() == null)) {
+                            mWithdrawalModel.setError(response.body().getError());
+
+                            if (!mWithdrawalModel.getError()) {
+
+                                mWithdrawalDataModel = mWithdrawalModel.getData();
+                                updateUIForTakerInformation();
+
+                            } else {
+                                Helper.createSnackbar(MakerActivity.this, response.body().getMessage());
+                            }
+                            progressDialog.cancel();
+                        }
+                    }
+
+                } catch (Exception e) {
+                    Log.e(TAG, "Response body is null");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<WithdrawalModel> call, Throwable t) {
+                Log.e(TAG, "onFailure()");
+            }
+        });
+
+    }
+
+    private void updateUIForTakerInformation()
+    {
+        List<Double> takerLocation = mWithdrawalDataModel.getTakerLocation();
+        addTakerMarker(takerLocation.get(0), takerLocation.get(1));
     }
 
     private void connectWebSocket()
@@ -421,7 +490,9 @@ public class MakerActivity extends BaseMapActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getExtras().getString(CommonConstants.MESSAGE);
-            createWitdrawEventDialog(message);
+            String withdrawalId = intent.getExtras().getString(CommonConstants.WITHDRAWAL);
+
+            createWitdrawEventDialog(message, withdrawalId);
         }
     };
 

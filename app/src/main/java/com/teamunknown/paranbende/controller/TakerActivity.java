@@ -52,7 +52,6 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
         initUI();
         setMapFragment();
         setMyLocationButton();
-
     }
 
     private void initUI() {
@@ -81,10 +80,8 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Prompt the user for permission.
         getLocationPermission();
         getDeviceLocation();
-
     }
 
     @Override
