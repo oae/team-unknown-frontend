@@ -1,6 +1,8 @@
 package com.teamunknown.paranbende;
 
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -8,14 +10,21 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String TAG = MainActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
-
 
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -42,6 +50,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
+    private ImageView locationUpdateIV;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +65,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         setContentView(R.layout.activity_main_taker);
+        locationUpdateIV = findViewById(R.id.locationUpdateImageView);
+        locationUpdateIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getDeviceLocation();
+            }
+        });
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -64,6 +81,36 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        @SuppressLint("ResourceType") View myLocationButton = mapFragment.getView().findViewById(0x2);
+        //myLocationButton.setBackground(getDrawable(R.drawable.));
+        if (myLocationButton != null && myLocationButton.getLayoutParams() instanceof RelativeLayout.LayoutParams) {
+            // location button is inside of RelativeLayout
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) myLocationButton.getLayoutParams();
+
+            // Align it to - parent BOTTOM|LEFT
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
+            params.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+
+            // Update margins, set to 10dp
+            final int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30,
+                    getResources().getDisplayMetrics());
+            params.setMargins(margin, margin, margin, margin);
+
+            myLocationButton.setLayoutParams(params);
+        }
+
+
+    }
+
+    private void updateLocationOnMap(double latitude,double longitude,int zoomLevel) {
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(latitude,longitude), zoomLevel));
+        CircleOptions circle = new CircleOptions().center(new LatLng(latitude,longitude))
+                .strokeColor(Color.RED)
+                .radius(500); // In meters
+        mMap.addCircle(circle);
     }
 
     @Override
@@ -82,8 +129,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Prompt the user for permission.
         getLocationPermission();
-        updateLocationUI();
         getDeviceLocation();
+
+
 
 
     }
@@ -99,21 +147,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(mLastKnownLocation.getLatitude(),
-                                            mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                            updateLocationOnMap(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude(),DEFAULT_ZOOM);
+                            mMap.addMarker(new MarkerOptions()
+                                    .title("Test")
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.dummy_pic))
+                                    .position(new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude())));
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
-                            mMap.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
-                            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+                            updateLocationOnMap(mDefaultLocation.latitude,mDefaultLocation.longitude,DEFAULT_ZOOM);
                         }
-                        updateLocationUI();
                     }
                 });
-                mMap.addMarker(new MarkerOptions()
-                        .position(mDefaultLocation));
+
 
                 // Prompt the user for permission.
                 getLocationPermission();
@@ -164,22 +210,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         }
-        updateLocationUI();
     }
 
 
-    private void updateLocationUI() {
-        if (mMap == null) {
-            return;
-        }
-        try {
-            if (mLocationPermissionGranted) {
-                mMap.setMyLocationEnabled(true);
-                mMap.getUiSettings().setMyLocationButtonEnabled(true);
-            }
-        } catch (SecurityException e) {
-            Log.e("Exception: %s", e.getMessage());
-        }
-    }
+
 
 }
