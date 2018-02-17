@@ -25,7 +25,7 @@ public class PushNotificationExtender extends NotificationExtenderService
         String userId = PreferencesPB.getValue(GeneralValues.LOGIN_USER_ID);
         try
         {
-            if(userId.equals(receivedResult.payload.additionalData.getString("userId")) || true)
+            if(userId.equals(receivedResult.payload.additionalData.getString("userId")))
             {
                 JSONObject withdrawObj = receivedResult.payload.additionalData.getJSONObject("withdrawal");
 

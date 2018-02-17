@@ -177,6 +177,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                                 mUserLoginModel.setData(response.body().getData());
                                 mData = mUserLoginModel.getData();
                                 mUser.setEmail(mData.getUser().getEmail());
+                                mUser.setId(mData.getUser().getId());
 
                                 PreferencesPB.setValue(GeneralValues.LOGIN_USER_NAME, mUser.getEmail());
                                 PreferencesPB.setValue(GeneralValues.LOGIN_ACCESS_TOKEN, mData.getToken());
