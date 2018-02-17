@@ -1,81 +1,60 @@
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.teamunknown.paranbende.MainActivity" >
+    tools:context="com.teamunknown.paranbende.controller.MainActivity">
 
 
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        />
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
+        <EditText
+            android:id="@+id/moneyAmountEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="25dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/shape_bordered_background"
+            android:inputType="number"
+            android:maxLength="10"
+            android:minHeight="50dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:paddingTop="10dp"
+            android:textColor="@color/black"
+            android:textSize="15dp" />
+
+        <Button
+            android:id="@+id/searchButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignBottom="@+id/moneyAmountEditText"
+            android:layout_alignEnd="@+id/moneyAmountEditText"
+            android:background="@android:drawable/ic_menu_search" />
+
 
 
     </RelativeLayout>
 
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/locationUpdateImageView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="bottom">
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:id="@+id/driverInfo"-->
-            <!--android:layout_gravity="bottom"-->
-            <!--android:orientation="horizontal"-->
-            <!--android:background="@android:color/white"-->
-            <!--android:visibility="gone">-->
-            <!--<ImageView-->
-                <!--android:layout_width="100sp"-->
-                <!--android:layout_height="100sp"-->
-                <!--android:id="@+id/driverProfileImage"-->
-                <!--android:src="@mipmap/ic_default_user"-->
-                <!--android:padding="20sp"/>-->
-            <!--<LinearLayout-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:orientation="vertical"-->
-                <!--android:paddingLeft="40sp">-->
-                <!--<TextView-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:id="@+id/driverName"-->
-                    <!--android:paddingBottom="10sp"-->
-                    <!--android:paddingTop="20sp"/>-->
-                <!--<TextView-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:id="@+id/driverPhone"-->
-                    <!--android:paddingBottom="10sp"-->
-                    <!--android:paddingTop="20sp"/>-->
-                <!--<TextView-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:id="@+id/driverCar"-->
-                    <!--android:paddingBottom="10sp"-->
-                    <!--android:paddingTop="20sp"/>-->
-                <!--<RatingBar-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:id="@+id/ratingBar"-->
-                    <!--android:layout_gravity="center"-->
-                    <!--android:numStars="5"-->
-                    <!--android:stepSize="0.1"/>-->
-            <!--</LinearLayout>-->
-        <!--</LinearLayout>-->
-
-    </LinearLayout>
-
+        map:srcCompat="@drawable/dummy_pic"
+        android:background="@color/white"
+        android:layout_gravity="bottom|right"
+        android:padding="20dp"
+        android:layout_margin="10dp"/>
 
 
 </FrameLayout>
