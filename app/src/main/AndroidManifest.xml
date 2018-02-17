@@ -32,9 +32,13 @@
         <activity android:name=".controller.LoginActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:windowSoftInputMode="adjustPan">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
-        <activity android:name=".controller.MainActivity">
+        <activity android:name=".controller.TakerActivity">
 
         </activity>
 
@@ -47,15 +51,10 @@
                 android:value=".controller.LoginActivity" />
         </activity>
 
-        <activity android:name=".controller.MainActivity">
 
-        </activity>
 
         <activity android:name=".MakerActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
         </activity>
         
     </application>

@@ -52,5 +52,9 @@
 
     </style>
 
+    <style name="PB.PopupMenu" parent="android:Widget.Holo.Light.ListPopupWindow">
+        <item name="android:popupBackground">#21B6A8</item>
+    </style>
+
 </resources>
 

@@ -34,7 +34,6 @@
     <string name="error_field_required">This field is required</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="loading">Loading..</string>
-    <string name="ok">Okay</string>
     <string name="internet_connection_problem" type="id">Internet Connection Problem</string>
     <string name="something_going_wrong">Ops, something going wrong</string>
     <string name="successfully_registration_message">Your account has created successfully</string>

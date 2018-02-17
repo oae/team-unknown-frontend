@@ -171,7 +171,7 @@ public class LoginActivity extends AppCompatActivity {
                                 PreferencesPB.setValue(GeneralValues.LOGIN_USER_NAME, mUser.getEmail());
                                 PreferencesPB.setValue(GeneralValues.LOGIN_ACCESS_TOKEN, mData.getToken());
 
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                Intent intent = new Intent(LoginActivity.this, TakerActivity.class);
                                 startActivity(intent);
                                 LoginActivity.this.finish();
                                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -242,7 +242,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void checkUserLogInStatus() {
         if (PreferencesPB.checkPreferencesWhetherTheValueisExistorNot(GeneralValues.LOGIN_USER_NAME)) {
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            Intent intent = new Intent(LoginActivity.this, TakerActivity.class);
             LoginActivity.this.finish();
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
