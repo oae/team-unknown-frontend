@@ -11,6 +11,8 @@ public class CommonConstants
     public static final String WHERE_FROM = "where_from";
     public static final String FROM_PUSH_NOTIFICATION = "form_push";
     public static final String MESSAGE = "message";
+    public static final String WITHDRAWAL_ID = "_id";
+    public static final String WITHDRAWAL = "withdrawal";
 
     public static final String ACTION_START = "ACTION_START";
     public static final String ACTION_LOCATION_UPDATE = "ACTION_LOCATION_UPDATE";

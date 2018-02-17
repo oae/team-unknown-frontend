@@ -126,19 +126,7 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
             public void onLocationResult(LocationResult locationResult)
             {
                 mLastKnownLocation = locationResult.getLastLocation();
-
-                if (null == currentMarker)
-                {
-                    return;
-                }
-
-                currentMarker.remove();
-
-                currentMarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(MapHelper.getMarkerBitmapFromView(BaseMapActivity.this, R.drawable.ic_men_web))).position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())));
-
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-
-                updateObjectsOnMap(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), DEFAULT_ZOOM);
+                updateLocationOnMap(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), DEFAULT_ZOOM);
             }
 
             ;
@@ -182,14 +170,14 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
-                            //updateLocationOnMap(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude(),DEFAULT_ZOOM);
+                            updateLocationOnMap(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude(),DEFAULT_ZOOM);
                             currentMarker = mMap.addMarker(new MarkerOptions()
                                     .icon(BitmapDescriptorFactory.fromBitmap(MapHelper.getMarkerBitmapFromView(BaseMapActivity.this, R.drawable.ic_men_web)))
                                     .position(new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude())));
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
-                            //updateLocationOnMap(mDefaultLocation.latitude,mDefaultLocation.longitude,DEFAULT_ZOOM);
+                            updateLocationOnMap(mDefaultLocation.latitude,mDefaultLocation.longitude,DEFAULT_ZOOM);
                         }
                     }
                 });
@@ -201,6 +189,18 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
         } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
+    }
+
+    protected void updateLocationOnMap(double latitude,double longitude,int zoomLevel)
+    {
+        if (null != currentMarker)
+        {
+            currentMarker.remove();
+        }
+
+        currentMarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(MapHelper.getMarkerBitmapFromView(BaseMapActivity.this, R.drawable.ic_men_web))).position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), DEFAULT_ZOOM));
+        updateObjectsOnMap(latitude, longitude, DEFAULT_ZOOM);
     }
 
     protected abstract void updateObjectsOnMap(double latitude,double longitude,int zoomLevel);

@@ -4,7 +4,6 @@ package com.teamunknown.paranbende.controller;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,18 +11,19 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.CircleOptions;
-import com.google.android.gms.maps.model.LatLng;
 import com.teamunknown.paranbende.BaseMapActivity;
 import com.teamunknown.paranbende.constants.GeneralValues;
 import com.teamunknown.paranbende.R;
 import com.teamunknown.paranbende.RestInterfaceController;
+import com.teamunknown.paranbende.helpers.DialogHelper;
+import com.teamunknown.paranbende.helpers.RequestHelper;
 import com.teamunknown.paranbende.model.WithdrawalDataModel;
 import com.teamunknown.paranbende.model.WithdrawalModel;
 import com.teamunknown.paranbende.model.WithdrawalTakerModel;
 import com.teamunknown.paranbende.util.Helper;
 import com.teamunknown.paranbende.util.PreferencesPB;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -47,17 +47,13 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
 
     private JSONObject requestBody;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main_taker);
-
         initUI();
-
         setMapFragment();
-
         setMyLocationButton();
 
     }
@@ -69,12 +65,9 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
     }
 
     @Override
-    protected void updateObjectsOnMap(double latitude, double longitude, int zoomLevel) {
-        CircleOptions circle = new CircleOptions().center(new LatLng(latitude, longitude))
-                .strokeColor(Color.RED)
-                .radius(500); // In meters
-
-        mMap.addCircle(circle);
+    protected void updateObjectsOnMap(double latitude, double longitude, int zoomLevel)
+    {
+        return;
     }
 
 
@@ -101,42 +94,41 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.searchButton:
-                createWithDrawal(moneyAmountEditText.getText().toString().equals("") ? 0 : Integer.parseInt(moneyAmountEditText.getText().toString()));
+                createWithdrawal(moneyAmountEditText.getText().toString().equals("") ? 0 : Integer.parseInt(moneyAmountEditText.getText().toString()));
                 break;
         }
-
-
     }
 
-    private void createWithDrawal(int moneyAmount) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(GeneralValues.BASE_URL)
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        serviceAPI = retrofit.create(RestInterfaceController.class);
-
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(getString(R.string.searching));
-        progressDialog.setCancelable(false);
-        progressDialog.setButton(Dialog.BUTTON_POSITIVE, getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                progressDialog.dismiss();
-            }
-        });
-        progressDialog.show();
-
-
-        try {
-            JSONObject json = new JSONObject();
+    private JSONObject createWithdrawalRequestBody(int moneyAmount)
+    {
+        JSONObject json = null;
+        try
+        {
+            json = new JSONObject();
             json.put("amount", moneyAmount);
-            requestBody = json;
-        } catch (JSONException e) {
+
+            JSONArray locationArray = new JSONArray();
+            locationArray.put(mLastKnownLocation.getLatitude());
+            locationArray.put(mLastKnownLocation.getLongitude());
+
+            json.put("location", locationArray);
+
+        }
+        catch (JSONException e)
+        {
             e.printStackTrace();
             Log.e(TAG, "JSON Exception");
         }
+
+        return json;
+    }
+
+    private void createWithdrawal(int moneyAmount)
+    {
+        serviceAPI = RequestHelper.createServiceAPI();
+        progressDialog = DialogHelper.show(this);
+
+        requestBody = createWithdrawalRequestBody(moneyAmount);
 
         retrofit2.Call<WithdrawalModel> call = serviceAPI.createWithdrawal("Bearer " + PreferencesPB.getValue(GeneralValues.LOGIN_ACCESS_TOKEN),
                 requestBody.toString());
@@ -161,7 +153,6 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
                                 Helper.createSnackbar(TakerActivity.this, response.body().getMessage());
                                 progressDialog.cancel();
                             }
-
                         }
                     }
 

@@ -154,7 +154,6 @@ public class MakerActivity extends BaseMapActivity
                     public void onClick(DialogInterface dialog, int id) {
 
                         // TODO: Sent accept request to for withdrawal.
-
                         // Start to web socket connection to sent own location.
                         connectWebSocket();
                     }

@@ -11,6 +11,7 @@ import com.teamunknown.paranbende.constants.GeneralValues;
 import com.teamunknown.paranbende.util.PreferencesPB;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by msalihkarakasli on 17.02.2018.
@@ -26,11 +27,13 @@ public class PushNotificationExtender extends NotificationExtenderService
         {
             if(userId.equals(receivedResult.payload.additionalData.getString("userId")) || true)
             {
+                JSONObject withdrawObj = receivedResult.payload.additionalData.getJSONObject("withdrawal");
+
                 if (receivedResult.isAppInFocus)
                 {
                     Intent intent = new Intent(CommonConstants.WITHDRAW_MATCH_EVENT);
                     intent.putExtra(CommonConstants.MESSAGE, receivedResult.payload.body);
-
+                    intent.putExtra(CommonConstants.WITHDRAWAL, withdrawObj.getString(CommonConstants.WITHDRAWAL_ID));
                     LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
                     return true;
