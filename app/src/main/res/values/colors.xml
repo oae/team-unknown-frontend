@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008590</color>
-    <color name="colorPrimaryDark">#009090</color>
-    <color name="colorAccent">#008080</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="blue">#2196F3</color>
@@ -14,4 +11,7 @@
     <color name="medium_grey">#ebebeb</color>
     <color name="teal">#008080</color>
 
+    <color name="colorPrimary">#008080</color>
+    <color name="colorPrimaryDark">#008080</color>
+    <color name="colorAccent">#04cbcb</color>
 </resources>

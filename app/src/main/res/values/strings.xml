@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">ParanBende</string>
+
     <string name="splash_text">Paran Bende</string>
 
     <!-- Strings related to login -->
@@ -7,4 +8,22 @@
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Login</string>
     <string name="action_sign_in_short">Login</string>
+
+    <string name="title_activity_maker">MakerActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="application_name">Paran Bende</string>
+    <string name="dummy_user_name">Ahmet Çelik</string>
+
+    <string name="max_amount">Max Amount</string>
+    <string name="min_amount">Min Amount</string>
+    <string name="range">Distance</string>
+    <string name="status">Status</string>
+
+    <string name="ok">OK</string>
+
 </resources>

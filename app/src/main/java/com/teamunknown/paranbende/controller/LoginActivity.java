@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.teamunknown.paranbende.GeneralValues;
 import com.teamunknown.paranbende.R;
+import com.teamunknown.paranbende.RestInterfaceController;
 import com.teamunknown.paranbende.util.PreferencesPB;
 
 /**
@@ -33,7 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView mAccountRegisterTextBtn;
 
     private RestInterfaceController serviceAPI;
-    private UserLoginTokenModel userLoginTokenModel;
+    //private UserLoginTokenModel userLoginTokenModel;
 
     private static String grantType = "password";
     private String usernameStr, passwordStr;
@@ -59,9 +60,10 @@ public class LoginActivity extends AppCompatActivity {
         }else{
 
         }
-        }
+    }
 
     private void checkUserLogInStatus() {
+        /*
         if (PreferencesPB.checkPreferencesWhetherTheValueisExistorNot(GeneralValues.LOGIN_DEVICE_ID)){
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             LoginActivity.this.finish();
@@ -71,6 +73,7 @@ public class LoginActivity extends AppCompatActivity {
         else {
 
         }
+        */
 
     }
 
