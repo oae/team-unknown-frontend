@@ -166,7 +166,6 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         call.enqueue(new Callback<UserLoginModel>() {
             @Override
             public void onResponse(retrofit2.Call<UserLoginModel> call, Response<UserLoginModel> response) {
-                response.body();
                 try {
                     int code = response.code();
                     mUserLoginModel = new UserLoginModel();
@@ -194,7 +193,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                                     }
                                 }
                                 else {
-                                    intent = new Intent(LoginActivity.this, MakerActivity.class);
+                                    intent = new Intent(LoginActivity.this, TakerActivity.class);
                                 }
                                 startActivity(intent);
                                 LoginActivity.this.finish();
@@ -268,11 +267,11 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         if (PreferencesPB.checkPreferencesWhetherTheValueisExistorNot(GeneralValues.LOGIN_USER_NAME)) {
             Intent intent;
             if (PreferencesPB.checkPreferencesWhetherTheValueisExistorNot(GeneralValues.LOGIN_USER_TYPE) &&
-                    PreferencesPB.getValue(GeneralValues.LOGIN_USER_TYPE)=="Taker"){
-                intent = new Intent(LoginActivity.this, TakerActivity.class);
+                    PreferencesPB.getValue(GeneralValues.LOGIN_USER_TYPE)=="Maker"){
+                intent = new Intent(LoginActivity.this, MakerActivity.class);
             }
             else {
-                intent = new Intent(LoginActivity.this, MakerActivity.class);
+                intent = new Intent(LoginActivity.this, TakerActivity.class);
             }
             LoginActivity.this.finish();
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);

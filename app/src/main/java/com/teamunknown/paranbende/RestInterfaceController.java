@@ -1,10 +1,12 @@
 package com.teamunknown.paranbende;
 
 import com.teamunknown.paranbende.model.UserLoginModel;
+import com.teamunknown.paranbende.model.WithdrawalModel;
 
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
@@ -23,6 +25,11 @@ public interface RestInterfaceController {
     @Headers("Content-Type: application/json")
     @POST("/user/register")
     Call<UserLoginModel> userRegister(@Body String body);
+
+    /*  create withdrawal    */
+    @Headers("Content-Type: application/json")
+    @POST("/taker/create-withdrawal")
+    Call<WithdrawalModel> createWithdrawal(@Header("Authorization") String authorization, @Body String body);
 
 
 

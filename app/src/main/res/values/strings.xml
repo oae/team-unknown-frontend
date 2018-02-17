@@ -49,7 +49,8 @@
 
     <string name="accept">Onayla</string>
     <string name="reject">Reddet</string>
-
+    <string name="searching">Searching..</string>
+    <string name="cancel">Cancel</string>
 
 
 </resources>
