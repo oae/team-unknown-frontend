@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">ParanBende</string>
+    <string name="splash_text">Paran Bende</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Username</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Login</string>
+    <string name="action_sign_in_short">Login</string>
 </resources>
