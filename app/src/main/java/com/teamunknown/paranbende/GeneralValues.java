@@ -5,4 +5,8 @@ package com.teamunknown.paranbende;
  */
 
 public class GeneralValues {
+
+//    //LOGIN
+//    public static final String LOGIN_DEVICE_ID="device_id";
+
 }

@@ -61,7 +61,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_email"
-                    android:textColor="@color/blue_v2"
+                    android:textColor="@color/colorPrimaryDark"
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     />
@@ -74,15 +74,15 @@
                 android:theme="@style/TextLabel"
                 android:padding="10dp"
                 app:passwordToggleEnabled="true"
-                app:passwordToggleTintMode="screen">
+                app:passwordToggleTintMode="screen"
+                app:passwordToggleDrawable="@drawable/toggle_pass">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_password"
-                    android:textColor="@color/blue_v2"
-                    android:imeActionId="@+id/login"
+                    android:textColor="@color/colorPrimaryDark"
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
@@ -102,7 +102,7 @@
                 android:layout_marginTop="50dp"
                 android:padding="10dp"
                 android:text="@string/action_sign_in"
-                android:background="@color/blue"
+                android:background="@color/colorPrimary"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
@@ -118,7 +118,7 @@
         android:layout_marginTop="20dp"
         android:gravity="center_horizontal|center_vertical"
         android:text="Click here to register"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="@color/colorPrimary"
         android:textSize="20dp"
         android:layout_alignParentBottom="true"/>
 </RelativeLayout>
