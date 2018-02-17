@@ -2,6 +2,7 @@ package com.teamunknown.paranbende;
 
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,12 +22,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.teamunknown.paranbende.constants.MapConstants;
+import com.teamunknown.paranbende.helpers.MapHelper;
 
 /**
  * Created by msalihkarakasli on 17.02.2018.
@@ -95,21 +99,19 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(mLastKnownLocation.getLatitude(),
-                                            mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                            updateLocationOnMap(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude(),DEFAULT_ZOOM);
+                            mMap.addMarker(new MarkerOptions()
+                                    .title("Test")
+                                    .icon(BitmapDescriptorFactory.fromBitmap(MapHelper.getMarkerBitmapFromView(BaseMapActivity.this, R.drawable.ic_men_web)))
+                                    .position(new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude())));
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
-                            mMap.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
-                            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+                            updateLocationOnMap(mDefaultLocation.latitude,mDefaultLocation.longitude,DEFAULT_ZOOM);
                         }
-                        updateLocationUI();
                     }
                 });
-                mMap.addMarker(new MarkerOptions()
-                        .position(mDefaultLocation));
+
 
                 // Prompt the user for permission.
                 getLocationPermission();
@@ -119,6 +121,14 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
         }
     }
 
+    private void updateLocationOnMap(double latitude,double longitude,int zoomLevel) {
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(latitude,longitude), zoomLevel));
+        CircleOptions circle = new CircleOptions().center(new LatLng(latitude,longitude))
+                .strokeColor(Color.RED)
+                .radius(500); // In meters
+        mMap.addCircle(circle);
+    }
 
     protected void getLocationPermission() {
         /*
@@ -143,6 +153,7 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
             if (mLocationPermissionGranted) {
                 mMap.setMyLocationEnabled(false);
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
+                mMap.getUiSettings().setCompassEnabled(false);
             }
         } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());

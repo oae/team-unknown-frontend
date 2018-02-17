@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,6 +59,19 @@ public class MakerActivity extends BaseMapActivity
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+        ImageView iToggleBtn = findViewById(R.id.iMenuToggle);
+
+        iToggleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+                if (!drawer.isDrawerOpen(GravityCompat.START))
+                {
+                    drawer.openDrawer(GravityCompat.START);
+                }
+            }
+        });
 
         Button bSettingsOk = (Button) findViewById(R.id.b_settings_ok);
 

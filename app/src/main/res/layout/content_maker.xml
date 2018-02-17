@@ -22,14 +22,20 @@
             android:layout_height="match_parent"/>
 
         <ImageView
+            android:id="@+id/iMenuToggle"
+            android:layout_margin="20dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_menu"/>
+
+        <ImageView
             android:id="@+id/locationUpdateImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            map:srcCompat="@drawable/dummy_pic"
-            android:background="@color/white"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_nav"
+            android:layout_gravity="bottom|right"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:padding="20dp"
             android:layout_margin="10dp"/>
 
     </RelativeLayout>
