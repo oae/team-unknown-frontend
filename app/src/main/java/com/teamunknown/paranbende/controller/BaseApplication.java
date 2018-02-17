@@ -3,6 +3,8 @@ package com.teamunknown.paranbende.controller;
 import android.app.Application;
 import android.content.Context;
 
+import com.onesignal.OneSignal;
+
 /**
  * Created by halitogunc on 17.02.2018.
  */
@@ -18,5 +20,10 @@ public class BaseApplication extends Application {
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
+
+        OneSignal.startInit(this)
+                .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+                .unsubscribeWhenNotificationsAreDisabled(true)
+                .init();
     }
 }

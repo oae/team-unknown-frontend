@@ -1,6 +1,12 @@
 package com.teamunknown.paranbende;
 
 import android.os.Bundle;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -12,7 +18,7 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.teamunknown.paranbende.constants.CommonConstants;
 
 public class MakerActivity extends BaseMapActivity
 {
@@ -90,7 +96,6 @@ public class MakerActivity extends BaseMapActivity
         return;
     }
 
-
     @Override
     public void onBackPressed()
     {
@@ -103,5 +108,32 @@ public class MakerActivity extends BaseMapActivity
         {
             super.onBackPressed();
         }
+    }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Extract data included in the Intent
+            String message = intent.getStringExtra("amount");
+
+            Toast.makeText(MakerActivity.this, "Bilgi:" + message, Toast.LENGTH_LONG).show();
+
+            Log.d("receiver", "Got message: " + message);
+        }
+    };
+
+    @Override
+    protected void onPause() {
+        // Unregister since the activity is not visible
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Register mMessageReceiver to receive messages.
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(CommonConstants.WITHDRAW_MATCH_EVENT));
     }
 }
