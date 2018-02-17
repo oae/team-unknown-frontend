@@ -1,9 +1,10 @@
 package com.teamunknown.paranbende;
 
+import com.teamunknown.paranbende.model.UserLoginModel;
+
+
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
@@ -13,10 +14,17 @@ import retrofit2.http.POST;
 
 public interface RestInterfaceController {
 
+    /*  login    */
+    @Headers("Content-Type: application/json")
+    @POST("/user/login")
+    Call<UserLoginModel> userLogin(@Body String body);
+
     /*  register    */
     @Headers("Content-Type: application/json")
-    @POST("/api/Account/Register")
-    Call<Void> userSignUp(@Body String body);
+    @POST("/user/register")
+    Call<UserLoginModel> userRegister(@Body String body);
+
+
 
 
 
