@@ -171,6 +171,10 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
                             updateLocationOnMap(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude(),DEFAULT_ZOOM);
+                            if (currentMarker != null)
+                            {
+                                currentMarker.remove();
+                            }
                             currentMarker = mMap.addMarker(new MarkerOptions()
                                     .icon(BitmapDescriptorFactory.fromBitmap(MapHelper.getMarkerBitmapFromView(BaseMapActivity.this, R.drawable.ic_men_web)))
                                     .position(new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude())));
