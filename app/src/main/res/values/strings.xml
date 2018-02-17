@@ -25,5 +25,21 @@
     <string name="status">Status</string>
 
     <string name="ok">OK</string>
+    <string name="e_mail">E-Mail</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="submit">Submit</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="password_length_failed">Your password must be at least 6 characters</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="loading">Loading..</string>
+    <string name="ok">Okay</string>
+    <string name="internet_connection_problem" type="id">Internet Connection Problem</string>
+    <string name="something_going_wrong">Ops, something going wrong</string>
+    <string name="successfully_registration_message">Your account has created successfully</string>
+    <string name="password_confirmation_failed">Please enter the same password again.</string>
+
+
 
 </resources>
