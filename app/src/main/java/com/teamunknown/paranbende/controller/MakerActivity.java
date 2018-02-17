@@ -133,14 +133,11 @@ public class MakerActivity extends BaseMapActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                 TextView tIsOnline = findViewById(R.id.tIsOnline);
-                TextView tIsOffline = findViewById(R.id.tIsOffline);
-
+                updateToogleOnline(isChecked);
                 if (isChecked) {
-                    tIsOffline.setVisibility(View.GONE);
-                    tIsOnline.setVisibility(View.VISIBLE);
+                    tIsOnline.setTextColor(getColor(R.color.white));
                 } else {
-                    tIsOffline.setVisibility(View.VISIBLE);
-                    tIsOnline.setVisibility(View.GONE);
+                    tIsOnline.setTextColor(getColor(R.color.black));
                 }
             }
         });
@@ -157,6 +154,8 @@ public class MakerActivity extends BaseMapActivity {
             createWitdrawEventDialog(message, withdrawalId);
         }
     }
+
+
 
     private void saveSettings() {
 
