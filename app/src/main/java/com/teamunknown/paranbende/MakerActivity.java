@@ -1,11 +1,13 @@
 package com.teamunknown.paranbende;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
@@ -34,6 +36,12 @@ public class MakerActivity extends BaseMapActivity
         Toolbar toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().hide();
+
+        String whereFrom = "";
+        if (getIntent() != null && getIntent().getExtras() != null)
+        {
+             whereFrom = getIntent().getExtras().getString(CommonConstants.WHERE_FROM);
+        }
 
         setMapFragment();
         setMyLocationButton();
@@ -88,6 +96,11 @@ public class MakerActivity extends BaseMapActivity
                 }
             }
         });
+
+        if (CommonConstants.FROM_PUSH_NOTIFICATION.equals(whereFrom)) {
+            String message = getIntent().getExtras().getString("message");
+            createWitdrawEventDialog(message);
+        }
     }
 
     @Override
@@ -110,15 +123,39 @@ public class MakerActivity extends BaseMapActivity
         }
     }
 
+    private void createWitdrawEventDialog(String message)
+    {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MakerActivity.this);
+        dialogBuilder.setTitle("Yeni bir işlem için onayınız bekleniyor!");
+        dialogBuilder.setMessage(message);
+        dialogBuilder.setCancelable(false);
+
+        dialogBuilder.setPositiveButton(
+                getResources().getString(R.string.accept),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        dialogBuilder.setNegativeButton(
+                getResources().getString(R.string.reject),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog dialogBox = dialogBuilder.create();
+        dialogBox.show();
+    }
+
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            // Extract data included in the Intent
-            String message = intent.getStringExtra("amount");
-
-            Toast.makeText(MakerActivity.this, "Bilgi:" + message, Toast.LENGTH_LONG).show();
-
-            Log.d("receiver", "Got message: " + message);
+        public void onReceive(Context context, Intent intent)
+        {
+            String message = intent.getExtras().getString(CommonConstants.MESSAGE);
+            createWitdrawEventDialog(message);
         }
     };
 

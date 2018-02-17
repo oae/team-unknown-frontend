@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.onesignal.OneSignal;
+import com.teamunknown.paranbende.PushNotificationHandler;
 
 /**
  * Created by halitogunc on 17.02.2018.
@@ -24,6 +25,7 @@ public class BaseApplication extends Application {
         OneSignal.startInit(this)
                 .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
                 .unsubscribeWhenNotificationsAreDisabled(true)
+                .setNotificationOpenedHandler(new PushNotificationHandler())
                 .init();
     }
 }

@@ -39,6 +39,9 @@
     <string name="successfully_registration_message">Your account has created successfully</string>
     <string name="password_confirmation_failed">Please enter the same password again.</string>
 
+    <string name="accept">Onayla</string>
+    <string name="reject">Reddet</string>
+
 
 
 </resources>
