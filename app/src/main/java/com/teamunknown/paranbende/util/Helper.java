@@ -3,6 +3,8 @@ package com.teamunknown.paranbende.util;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -11,6 +13,10 @@ import android.widget.TextView;
 
 import com.teamunknown.paranbende.R;
 import com.teamunknown.paranbende.controller.LoginActivity;
+
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * Created by halitogunc on 17.02.2018.
@@ -49,5 +55,16 @@ public class Helper {
         // Create the AlertDialog
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    public static Bitmap getDrawableFromUrl(String url) throws java.io.IOException {
+
+        HttpURLConnection connection = (HttpURLConnection)new URL(url) .openConnection();
+        connection.setRequestProperty("User-agent","Mozilla/4.0");
+
+        connection.connect();
+        InputStream input = connection.getInputStream();
+
+        return BitmapFactory.decodeStream(input);
     }
 }

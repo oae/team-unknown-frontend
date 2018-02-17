@@ -51,6 +51,7 @@
     <string name="reject">Reddet</string>
     <string name="searching">Searching..</string>
     <string name="cancel">Cancel</string>
+    <string name="save_settings">Settings is saved</string>
 
 
 </resources>

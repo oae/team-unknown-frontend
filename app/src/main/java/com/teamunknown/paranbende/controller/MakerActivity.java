@@ -1,6 +1,5 @@
 package com.teamunknown.paranbende.controller;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -22,10 +21,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 import com.teamunknown.paranbende.BaseMapActivity;
 import com.teamunknown.paranbende.R;
 import com.teamunknown.paranbende.RestInterfaceController;
@@ -43,6 +39,7 @@ import com.teamunknown.paranbende.model.WithdrawalTakerModel;
 import com.teamunknown.paranbende.util.Helper;
 import com.teamunknown.paranbende.util.PreferencesPB;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import retrofit2.Call;
@@ -71,8 +68,7 @@ public class MakerActivity extends BaseMapActivity {
     private JSONObject requestBody;
 
     private Switch sIsOnline;
-    private EditText mMinAmountEditText, mMaxAmountEditText , mDistanceEditText;
-
+    public EditText mMinAmountEditText, mMaxAmountEditText, mDistanceEditText;
 
 
     @Override
@@ -105,6 +101,7 @@ public class MakerActivity extends BaseMapActivity {
             public void onClick(View view) {
                 if (!drawer.isDrawerOpen(GravityCompat.START)) {
                     drawer.openDrawer(GravityCompat.START);
+                    getUserSettings();
                 }
             }
         });
@@ -116,7 +113,7 @@ public class MakerActivity extends BaseMapActivity {
             public void onClick(View view) {
                 if (view.getId() == R.id.b_settings_ok) {
                     drawer.closeDrawer(GravityCompat.START);
-                 //   saveSettings();
+                    saveSettings();
                 }
             }
         });
@@ -143,11 +140,75 @@ public class MakerActivity extends BaseMapActivity {
         mMaxAmountEditText = findViewById(R.id.e_max_amount);
         mDistanceEditText = findViewById(R.id.e_distance);
 
-        getUserSettings();
+
+
         if (CommonConstants.FROM_PUSH_NOTIFICATION.equals(whereFrom)) {
             String message = getIntent().getExtras().getString("message");
             createWitdrawEventDialog(message);
         }
+    }
+
+    private void saveSettings() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(GeneralValues.BASE_URL)
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        serviceAPI = retrofit.create(RestInterfaceController.class);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getString(R.string.loading));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        try {
+            JSONObject json = new JSONObject();
+            json.put("minAmount", Integer.parseInt(mMinAmountEditText.getText().toString()));
+            json.put("maxAmount", Integer.parseInt(mMaxAmountEditText.getText().toString()));
+            json.put("range", Integer.parseInt(mDistanceEditText.getText().toString()));
+            requestBody = json;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e(TAG, "JSON Exception");
+        }
+
+        retrofit2.Call<SettingsModel> call = serviceAPI.saveUserSettings("Bearer " + PreferencesPB.getValue(GeneralValues.LOGIN_ACCESS_TOKEN), requestBody.toString());
+        call.enqueue(new Callback<SettingsModel>() {
+            @Override
+            public void onResponse(Call<SettingsModel> call, Response<SettingsModel> response) {
+                try {
+                    int code = response.code();
+                    mSettingsModel = new SettingsModel();
+                    mSettingsDataModel = new SettingsDataModel();
+                    mSettingsMaker = new SettingsMaker();
+
+                    if (code == 200) {
+                        if (!(response.body() == null)) {
+                            mSettingsModel.setError(response.body().getError());
+
+                            if (!mSettingsModel.getError()) {
+
+                                Helper.createSnackbar(MakerActivity.this, getString(R.string.save_settings));
+
+                            } else {
+                                Helper.createSnackbar(MakerActivity.this, response.body().getMessage());
+                            }
+                            progressDialog.cancel();
+                        }
+                    }
+
+                } catch (Exception e) {
+                    Log.e(TAG, "Response body is null");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SettingsModel> call, Throwable t) {
+                Log.e(TAG, "onFailure()");
+            }
+        });
+
     }
 
     private void getUserSettings() {
@@ -178,13 +239,13 @@ public class MakerActivity extends BaseMapActivity {
                         if (!(response.body() == null)) {
                             mUserSettingsModel.setError(response.body().getError());
                             mUserSettingsModel.setData(response.body().getData());
-                            mUserSettingsData=mUserSettingsModel.getData();
-                            mUserSettingsMaker=mUserSettingsData.getMaker();
+                            mUserSettingsData = mUserSettingsModel.getData();
+                            mUserSettingsMaker = mUserSettingsData.getMaker();
                             if (!mUserSettingsModel.getError()) {
-                               // Picasso.with(getApplicationContext()).load(mUserSettingsData.getAvatar()).into((Target) toolbar.getNavigationIcon());
-                                mMinAmountEditText.setText(mUserSettingsMaker.getMinAmount());
-                                mMaxAmountEditText.setText(mUserSettingsMaker.getMaxAmount());
-                                mDistanceEditText.setText(mUserSettingsMaker.getRange());
+                                // Picasso.with(getApplicationContext()).load(mUserSettingsData.getAvatar()).into((Target) toolbar.getNavigationIcon());
+                                mMinAmountEditText.setText(String.valueOf(mUserSettingsMaker.getMinAmount()));
+                                mMaxAmountEditText.setText(String.valueOf(mUserSettingsMaker.getMaxAmount()));
+                                mDistanceEditText.setText(String.valueOf(mUserSettingsMaker.getRange()));
                             } else {
                                 Helper.createSnackbar(MakerActivity.this, response.body().getMessage());
                             }
@@ -266,7 +327,6 @@ public class MakerActivity extends BaseMapActivity {
     @Override
     public void onResume() {
         super.onResume();
-
         // Register mMessageReceiver to receive messages.
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(CommonConstants.WITHDRAW_MATCH_EVENT));
     }

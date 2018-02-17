@@ -1,5 +1,6 @@
 package com.teamunknown.paranbende;
 
+import com.teamunknown.paranbende.model.Settings.SettingsModel;
 import com.teamunknown.paranbende.model.Settings.UserSettings.UserSettingsModel;
 import com.teamunknown.paranbende.model.UserLoginModel;
 import com.teamunknown.paranbende.model.WithdrawalModel;
@@ -40,7 +41,7 @@ public interface RestInterfaceController {
     /* save settings */
     @Headers("Content-Type: application/json")
     @POST("/maker/save-settings")
-    Call<UserSettingsModel> saveUserSettings(@Header("Authorization") String authorization, @Body String body);
+    Call<SettingsModel> saveUserSettings(@Header("Authorization") String authorization, @Body String body);
 
 
 
