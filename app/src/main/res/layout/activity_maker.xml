@@ -26,7 +26,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <include layout="@layout/nav_header_maker" />
+        <include layout="@layout/nav_header_maker"/>
 
         <LinearLayout
             android:id="@+id/settings_container"

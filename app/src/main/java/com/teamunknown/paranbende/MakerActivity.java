@@ -1,6 +1,7 @@
 package com.teamunknown.paranbende;
 
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -32,6 +33,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -107,6 +109,20 @@ public class MakerActivity extends BaseMapActivity
         });
     }
 
+    @Override
+    protected void updateObjectsOnMap(double latitude,double longitude,int zoomLevel)
+    {
+        return;
+    }
+
+    private void updateLocationOnMap(double latitude,double longitude,int zoomLevel) {
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(latitude,longitude), zoomLevel));
+        CircleOptions circle = new CircleOptions().center(new LatLng(latitude,longitude))
+                .strokeColor(Color.RED)
+                .radius(500); // In meters
+        mMap.addCircle(circle);
+    }
 
     @Override
     public void onBackPressed()

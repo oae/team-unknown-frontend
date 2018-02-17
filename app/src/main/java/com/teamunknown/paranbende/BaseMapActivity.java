@@ -121,13 +121,13 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
         }
     }
 
+    protected abstract void updateObjectsOnMap(double latitude,double longitude,int zoomLevel);
+
     private void updateLocationOnMap(double latitude,double longitude,int zoomLevel) {
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                 new LatLng(latitude,longitude), zoomLevel));
-        CircleOptions circle = new CircleOptions().center(new LatLng(latitude,longitude))
-                .strokeColor(Color.RED)
-                .radius(500); // In meters
-        mMap.addCircle(circle);
+
+        updateObjectsOnMap(latitude, longitude, zoomLevel);
     }
 
     protected void getLocationPermission() {

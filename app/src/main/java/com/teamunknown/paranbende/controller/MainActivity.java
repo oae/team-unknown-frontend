@@ -47,6 +47,17 @@ public class MainActivity extends BaseMapActivity
     }
 
     @Override
+    protected void updateObjectsOnMap(double latitude,double longitude,int zoomLevel)
+    {
+        CircleOptions circle = new CircleOptions().center(new LatLng(latitude,longitude))
+                .strokeColor(Color.RED)
+                .radius(500); // In meters
+
+        mMap.addCircle(circle);
+    }
+
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         if (mMap != null) {
             outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
