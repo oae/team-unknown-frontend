@@ -1,20 +1,25 @@
 package com.teamunknown.paranbende;
 
 import android.annotation.SuppressLint;
+import android.app.Fragment;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -56,6 +61,8 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
 
     protected SupportMapFragment mapFragment;
 
+    private ActionBar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -68,6 +75,32 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        toolbar = getSupportActionBar();
+
+        BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+                = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Fragment fragment;
+                switch (item.getItemId()) {
+                    case R.id.navigation_shop:
+                        toolbar.setTitle("Shop");
+                        return true;
+                    case R.id.navigation_gifts:
+                        toolbar.setTitle("My Gifts");
+                        return true;
+                    case R.id.navigation_cart:
+                        toolbar.setTitle("Cart");
+                        return true;
+                    case R.id.navigation_profile:
+                        toolbar.setTitle("Profile");
+                        return true;
+                }
+                return false;
+            }
+        };
 
     }
 

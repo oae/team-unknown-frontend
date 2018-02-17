@@ -47,7 +47,6 @@
     </RelativeLayout>
 
 
-
     <ImageView
         android:id="@+id/locationUpdateImageView"
         android:layout_width="50dp"

@@ -93,6 +93,14 @@
             </android.support.design.widget.TextInputLayout>
 
 
+            <Spinner
+                android:id="@+id/user_type_spinner"
+                android:layout_width="60dp"
+                android:layout_height="40dp"
+                android:gravity="left"
+                android:background="@color/colorPrimary"
+                android:prompt="@string/spinner_title" />
+
 
             <Button
                 android:id="@+id/email_sign_in_button"

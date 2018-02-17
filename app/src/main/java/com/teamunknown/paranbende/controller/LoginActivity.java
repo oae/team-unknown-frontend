@@ -4,19 +4,25 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.teamunknown.paranbende.GeneralValues;
+import com.teamunknown.paranbende.MakerActivity;
 import com.teamunknown.paranbende.R;
 import com.teamunknown.paranbende.RestInterfaceController;
 import com.teamunknown.paranbende.model.Data;
@@ -28,6 +34,9 @@ import com.teamunknown.paranbende.util.PreferencesPB;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -38,7 +47,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
  * Created by halitogunc on 17.02.2018.
  */
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
 
@@ -46,6 +55,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mEmailView;
     private EditText mPasswordView;
     private Button mSignInBtn;
+    private Spinner mUserTypeSpinner;
     private ProgressDialog progressDialog;
     View focusView = null;
     private TextView mAccountRegisterTextBtn;
@@ -56,10 +66,14 @@ public class LoginActivity extends AppCompatActivity {
     private UserLoginModel mUserLoginModel;
 
     private String usernameStr, passwordStr;
-    private String error = "";
+    private String selectedItem = null;
+
 
     private JSONObject requestBody;
 
+
+
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
@@ -77,6 +91,13 @@ public class LoginActivity extends AppCompatActivity {
 
         mAccountRegisterTextBtn = findViewById(R.id.account_register_text);
 
+        mUserTypeSpinner = findViewById(R.id.user_type_spinner);
+
+        List list = new ArrayList();
+        list.add("Maker");
+        list.add("Taker");
+
+
         mAccountRegisterTextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,20 +108,6 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         mPasswordView = findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    try {
-                        attemptLogin();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });
 
         mSignInBtn = findViewById(R.id.email_sign_in_button);
         mSignInBtn.setOnClickListener(new View.OnClickListener() {
@@ -113,6 +120,12 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+        ArrayAdapter dataAdapter = new ArrayAdapter(this,android.R.layout.simple_spinner_item, list);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mUserTypeSpinner.setAdapter(dataAdapter);
+
 
     }
 
@@ -170,8 +183,15 @@ public class LoginActivity extends AppCompatActivity {
 
                                 PreferencesPB.setValue(GeneralValues.LOGIN_USER_NAME, mUser.getEmail());
                                 PreferencesPB.setValue(GeneralValues.LOGIN_ACCESS_TOKEN, mData.getToken());
+                                PreferencesPB.setValue(GeneralValues.LOGIN_USER_ID,mUser.getId());
+                                Intent intent;
+                                if (!(null ==selectedItem) && PreferencesPB.getValue(GeneralValues.LOGIN_USER_TYPE)=="Taker"){
+                                     intent = new Intent(LoginActivity.this, TakerActivity.class);
+                                }
+                                else {
+                                    intent = new Intent(LoginActivity.this, MakerActivity.class);
+                                }
 
-                                Intent intent = new Intent(LoginActivity.this, TakerActivity.class);
                                 startActivity(intent);
                                 LoginActivity.this.finish();
                                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -256,6 +276,17 @@ public class LoginActivity extends AppCompatActivity {
 
         ConnectivityManager connectivityManager = (ConnectivityManager) LoginActivity.this.getSystemService(Context.CONNECTIVITY_SERVICE);
         return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {
+        selectedItem = parent.getItemAtPosition(position).toString();
+        PreferencesPB.setValue(GeneralValues.LOGIN_USER_TYPE,selectedItem);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
 }

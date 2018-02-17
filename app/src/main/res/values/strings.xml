@@ -38,6 +38,14 @@
     <string name="something_going_wrong">Ops, something going wrong</string>
     <string name="successfully_registration_message">Your account has created successfully</string>
     <string name="password_confirmation_failed">Please enter the same password again.</string>
+    <string name="spinner_title">Choose a user type</string>
+
+
+        <string-array
+            name="userTypesArray">
+            <item>Taker</item>
+            <item>Maker</item>
+        </string-array>
 
     <string name="accept">Onayla</string>
     <string name="reject">Reddet</string>

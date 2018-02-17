@@ -13,5 +13,7 @@ public class GeneralValues {
     //LOGIN
     public static final String LOGIN_USER_NAME="user_name";
     public static final String LOGIN_ACCESS_TOKEN="access_token";
+    public static final String LOGIN_USER_ID="user_id";
+    public static final String LOGIN_USER_TYPE="user_type";
 
 }
