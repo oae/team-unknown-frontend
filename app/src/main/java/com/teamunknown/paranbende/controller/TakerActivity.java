@@ -101,7 +101,7 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.searchButton:
-                createWithDrawal(Integer.parseInt(moneyAmountEditText.getText().toString()));
+                createWithDrawal(moneyAmountEditText.getText().toString().equals("") ? 0 : Integer.parseInt(moneyAmountEditText.getText().toString()));
                 break;
         }
 
@@ -127,7 +127,6 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
             }
         });
         progressDialog.show();
-
 
 
         try {
