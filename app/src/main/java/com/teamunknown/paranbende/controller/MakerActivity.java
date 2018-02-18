@@ -109,6 +109,7 @@ public class MakerActivity extends BaseMapActivity {
 
         avatar = findViewById(R.id.headerImage);
 
+
         setMapFragment();
         setMyLocationButton();
 
