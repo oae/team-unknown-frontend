@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ParanBende</string>
+
+    <string name="splash_text">Paran Bende</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Kullanici Adi</string>
+    <string name="prompt_password">Sifre</string>
+    <string name="action_sign_in">Giris Yap</string>
+    <string name="action_sign_in_short">Giris</string>
+
+    <string name="title_activity_maker">MakerActivity</string>
+
+    <string name="navigation_drawer_open">Navigation drawer\'i Ac</string>
+    <string name="navigation_drawer_close">Navigation drawer\í Kapa</string>
+
+    <string name="action_settings">Ayarlar</string>
+
+    <string name="application_name">Paran Bende</string>
+    <string name="dummy_user_name">Getir</string>
+
+    <string name="max_amount">Maks Miktar</string>
+    <string name="min_amount">Min Miktar</string>
+    <string name="range">Mesafe</string>
+    <string name="status">Durum</string>
+
+    <string name="ok">OK</string>
+    <string name="e_mail">E-Mail</string>
+    <string name="password">Sifre</string>
+    <string name="confirm_password">Sifreni Onayla</string>
+    <string name="submit">Onayla</string>
+    <string name="sign_up">Uye ol</string>
+    <string name="password_length_failed">Sifren en az 6 karakter olmali.</string>
+    <string name="error_field_required">Bu alan bos birakilamaz.</string>
+    <string name="error_invalid_email">E-mail adresi gecersiz.</string>
+    <string name="loading">Yukleniyor..</string>
+    <string name="internet_connection_problem" type="id">Internet baglanti problemi</string>
+    <string name="something_going_wrong">Ops, birseyler ters gidiyor</string>
+    <string name="successfully_registration_message">Hesabiniz basari ile olusturuldu.</string>
+    <string name="password_confirmation_failed">Lutfen ayni sifreyi tekrar girin.</string>
+    <string name="spinner_title">Kullanici tipi secin</string>
+    <string name="accept">Onayla</string>
+    <string name="reject">Reddet</string>
+    <string name="searching">Araniyor..</string>
+    <string name="cancel">Iptal Et</string>
+    <string name="save_settings">Ayarlar kaydedildi.</string>
+    <string name="isOnlineChanged">Online durumu degisitirldi.</string>
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
+    <string name="chooseUserType">Kullanici tipi secin</string>
+    <string name="amountMoney">Ne kadar paraya ihtiyacin var ?</string>
+    <string name="logOut">Cikis Yap</string>
+
+
+</resources>

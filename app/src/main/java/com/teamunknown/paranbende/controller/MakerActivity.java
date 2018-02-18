@@ -7,9 +7,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -22,8 +24,13 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.WebSocket;
+import com.squareup.picasso.Picasso;
 import com.teamunknown.paranbende.BaseMapActivity;
 import com.teamunknown.paranbende.R;
 import com.teamunknown.paranbende.RestInterfaceController;
@@ -45,6 +52,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -82,6 +90,8 @@ public class MakerActivity extends BaseMapActivity {
     public EditText mMinAmountEditText, mMaxAmountEditText, mDistanceEditText;
     private TextView mLogOutText;
 
+    private ImageView avatar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,11 +106,19 @@ public class MakerActivity extends BaseMapActivity {
         if (getIntent() != null && getIntent().getExtras() != null) {
             whereFrom = getIntent().getExtras().getString(CommonConstants.WHERE_FROM);
         }
+        NavigationView navigationView=findViewById(R.id.nav_view);
+        View headerView = LayoutInflater.from(this).inflate(R.layout.nav_header_maker, navigationView, false);
+
+        avatar = headerView.findViewById(R.id.headerImage);
+        avatar.setBackground(getDrawable(R.drawable.app_logo));
+
+
 
         setMapFragment();
         setMyLocationButton();
 
         drawer = findViewById(R.id.drawer_layout);
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
@@ -317,6 +335,8 @@ public class MakerActivity extends BaseMapActivity {
                                 mMinAmountEditText.setText(String.valueOf(mUserSettingsMaker.getMinAmount()));
                                 mMaxAmountEditText.setText(String.valueOf(mUserSettingsMaker.getMaxAmount()));
                                 mDistanceEditText.setText(String.valueOf(mUserSettingsMaker.getRange()));
+                                Picasso.with(MakerActivity.this).load(mUserSettingsData.getAvatar()).into(avatar);
+                                toolbar.setNavigationIcon(R.drawable.ic_man_money);
                                 sIsOnline.setChecked(mUserSettingsMaker.getOnline());
                             } else {
                                 Helper.createSnackbar(MakerActivity.this, response.body().getMessage());
@@ -478,6 +498,8 @@ public class MakerActivity extends BaseMapActivity {
 
                 mWebSocket = webSocket;
 
+                isMatched = true;
+
                 try {
                     webSocket.send(createUpdateLocationMessage());
                 } catch (JSONException e) {
@@ -487,6 +509,22 @@ public class MakerActivity extends BaseMapActivity {
                 }
             }
         });
+    }
+
+    private void updateCameraView()
+    {
+        ArrayList<Marker> markers = new ArrayList<>();
+        markers.add(currentMarker);
+        markers.add(takerMarker);
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (Marker marker : markers) {
+            builder.include(marker.getPosition());
+        }
+        LatLngBounds bounds = builder.build();
+
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 300);
+        mMap.moveCamera(cu);
     }
 
     private String createUpdateLocationMessage() throws JSONException {

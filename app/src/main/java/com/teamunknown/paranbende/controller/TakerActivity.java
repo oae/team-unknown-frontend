@@ -13,7 +13,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.WebSocket;
 import com.teamunknown.paranbende.BaseMapActivity;
@@ -31,6 +36,8 @@ import com.teamunknown.paranbende.util.PreferencesPB;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -99,6 +106,7 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
         switch (view.getId()) {
             case R.id.searchButton:
                 createWithdrawal(moneyAmountEditText.getText().toString().equals("") ? 0 : Integer.parseInt(moneyAmountEditText.getText().toString()));
+                Helper.closeVirtualKeyboard(this);
                 break;
         }
     }
@@ -188,7 +196,7 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
 
                 }
             } catch (JSONException e) {
-                Log.e(TAG,e.getMessage());
+                Log.e(TAG, e.getMessage());
                 e.printStackTrace();
             }
 
@@ -206,7 +214,7 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
                 }
 
                 mWebSocket = webSocket;
-
+                isMatched = true;
                 try {
                     webSocket.send(subscriptionMessage());
                     webSocket.setStringCallback(new WebSocket.StringCallback() {
@@ -219,7 +227,7 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
                         }
                     });
                 } catch (JSONException e) {
-                    Log.e(TAG,e.getMessage());
+                    Log.e(TAG, e.getMessage());
                     e.printStackTrace();
                     return;
                 }
@@ -281,8 +289,10 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
 
                     try {
                         TakerActivity.this.addMakerMarker(location.getDouble(0), location.getDouble(1));
+
+                        updateCameraView();
                     } catch (JSONException e) {
-                        Log.e(TAG,e.getMessage());
+                        Log.e(TAG, e.getMessage());
                         e.printStackTrace();
                     }
                 }
@@ -290,6 +300,22 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
         }
 
         return true;
+    }
+
+    private void updateCameraView()
+    {
+        ArrayList<Marker> markers = new ArrayList<>();
+        markers.add(currentMarker);
+        markers.add(makerMarker);
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (Marker marker : markers) {
+            builder.include(marker.getPosition());
+        }
+        LatLngBounds bounds = builder.build();
+
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 300);
+        mMap.moveCamera(cu);
     }
 
 
@@ -306,4 +332,5 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
         // Register mMessageReceiver to receive messages.
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(CommonConstants.TAKER_WITHDRAW_MATCH_EVENT));
     }
+
 }
