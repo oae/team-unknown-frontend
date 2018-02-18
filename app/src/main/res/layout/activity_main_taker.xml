@@ -43,7 +43,7 @@
             android:layout_alignEnd="@+id/moneyAmountEditText"
             android:layout_marginBottom="5dp"
             android:layout_marginRight="5dp"
-            android:background="@android:drawable/ic_menu_search" />
+            android:background="@drawable/search_icon" />
 
 
 
@@ -54,7 +54,7 @@
         android:id="@+id/locationUpdateImageView"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@drawable/ic_nav"
+        android:src="@drawable/location_icon"
         android:layout_gravity="bottom|right"
         android:layout_margin="10dp"/>
 
