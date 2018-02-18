@@ -44,6 +44,7 @@
 
         <activity
             android:name=".controller.LoginActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
@@ -52,13 +53,16 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".controller.TakerActivity">
+        <activity
+            android:name=".controller.TakerActivity"
+            android:screenOrientation="portrait">
 
         </activity>
 
         <activity
             android:name=".controller.AccountRegisterActivity"
             android:label="@string/sign_up"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -68,6 +72,7 @@
 
         <activity
             android:name=".controller.MakerActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
 
         </activity>
