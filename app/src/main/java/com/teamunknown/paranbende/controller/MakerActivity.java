@@ -122,7 +122,7 @@ public class MakerActivity extends BaseMapActivity {
                 if (view.getId() == R.id.b_settings_ok) {
                     drawer.closeDrawer(GravityCompat.START);
                     saveSettings();
-                    getUserSettings();
+
                 }
             }
         });
@@ -367,7 +367,7 @@ public class MakerActivity extends BaseMapActivity {
     private void createWitdrawEventDialog(String message,final String withdrawalId)
     {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MakerActivity.this);
-        dialogBuilder.setTitle("Yeni bir işlem için onayınız bekleniyor!");
+        dialogBuilder.setTitle("We need your permission to keep going!");
         dialogBuilder.setMessage(message);
         dialogBuilder.setCancelable(false);
 
