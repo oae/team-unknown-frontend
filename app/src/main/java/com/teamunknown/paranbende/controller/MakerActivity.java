@@ -480,7 +480,7 @@ public class MakerActivity extends BaseMapActivity {
         mainRequestObject.put("method", "update-location");
 
         JSONObject payloadObject = new JSONObject();
-        payloadObject.put("id", "test1");
+        payloadObject.put("id", mWithdrawalModel.getData().getId());
 
         JSONArray locationArray = new JSONArray();
         locationArray.put(mLastKnownLocation.getLatitude());
@@ -505,38 +505,6 @@ public class MakerActivity extends BaseMapActivity {
         mainRequestObject.put("payload", payloadObject);
 
         return mainRequestObject.toString();
-    }
-
-    private boolean parseSocketMessage(String s) throws JSONException
-    {
-        if ("".equals(s))
-        {
-            return false;
-        }
-
-        JSONObject mainObject = new JSONObject(s);
-
-        String actionType = mainObject.getString("type");
-        JSONObject payloadObject = mainObject.getJSONObject("payload");
-
-        if (CommonConstants.ACTION_START.equals(actionType))
-        {
-
-        }
-        else if (CommonConstants.ACTION_LOCATION_UPDATE.equals(actionType))
-        {
-
-        }
-        else if (CommonConstants.ACTION_END.equals(actionType))
-        {
-
-        }
-        else
-        {
-
-        }
-
-        return true;
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {

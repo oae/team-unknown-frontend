@@ -16,6 +16,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.koushikdutta.async.http.AsyncHttpClient;
+import com.koushikdutta.async.http.WebSocket;
 import com.teamunknown.paranbende.BaseMapActivity;
 import com.teamunknown.paranbende.constants.CommonConstants;
 import com.teamunknown.paranbende.constants.GeneralValues;
@@ -42,11 +44,14 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
     Button searchButton;
     private ProgressDialog progressDialog;
 
+    WebSocket mWebSocket;
+
     private RestInterfaceController serviceAPI;
 
     private WithdrawalTakerModel mWithdrawalTakerModel;
     private WithdrawalModel mWithdrawalModel;
     private WithdrawalDataModel mWithDrawalDataModel;
+    private JSONObject withdrawalObj;
 
     private JSONObject requestBody;
 
@@ -177,12 +182,15 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
 
             String message = intent.getExtras().getString(CommonConstants.MESSAGE);
             try {
-                JSONObject withdrawal = new JSONObject(intent.getExtras().getString(CommonConstants.WITHDRAWAL));
-                if ("cancelled".equals(withdrawal.getString("status"))) {
+                withdrawalObj = new JSONObject(intent.getExtras().getString(CommonConstants.WITHDRAWAL));
+                if ("cancelled".equals(withdrawalObj.getString("status"))) {
                     Helper.createSnackbar(TakerActivity.this, "Withdrawal request cancelled by maker.");
                 }
-                else if ("matched".equals(withdrawal.getString("status"))) {
+                else if ("matched".equals(withdrawalObj.getString("status"))) {
                     Helper.createSnackbar(TakerActivity.this, "Maker is bringing your money.");
+
+                    connectWebSocket();
+
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -191,6 +199,111 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
 
         }
     };
+
+    private void connectWebSocket()
+    {
+        AsyncHttpClient.getDefaultInstance().websocket("ws://lab.nepjua.org:23000", null, new AsyncHttpClient.WebSocketConnectCallback() {
+            @Override
+            public void onCompleted(Exception ex, WebSocket webSocket) {
+                if (ex != null) {
+                    ex.printStackTrace();
+                    return;
+                }
+
+                mWebSocket = webSocket;
+
+                try
+                {
+                    webSocket.send(subscriptionMessage());
+                    webSocket.setStringCallback(new WebSocket.StringCallback() {
+                        public void onStringAvailable(String s) {
+                            try {
+                                parseSocketMessage(s);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+                catch (JSONException e)
+                {
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        });
+    }
+
+    private String subscriptionMessage() throws JSONException
+    {
+        if (mLastKnownLocation == null)
+        {
+            return subscriptionMessageError();
+        }
+        JSONObject mainRequestObject = new JSONObject();
+
+        mainRequestObject.put("type", "subscribe");
+        mainRequestObject.put("channel", "live-location");
+
+        JSONObject payloadObject = new JSONObject();
+        payloadObject.put("id", withdrawalObj.getString("_id"));
+
+        mainRequestObject.put("payload", payloadObject);
+
+        return mainRequestObject.toString();
+    }
+
+    private String subscriptionMessageError() throws JSONException
+    {
+        JSONObject mainRequestObject = new JSONObject();
+
+        mainRequestObject.put("type", "error");
+
+        JSONObject payloadObject = new JSONObject();
+        payloadObject.put("name", "LocationUpdateFail");
+
+        mainRequestObject.put("payload", payloadObject);
+
+        return mainRequestObject.toString();
+    }
+
+    private boolean parseSocketMessage(String s) throws JSONException
+    {
+        if ("".equals(s))
+        {
+            return false;
+        }
+
+        JSONObject mainObject = new JSONObject(s);
+
+        String actionType = mainObject.getString("type");
+        JSONObject payloadObject = mainObject.getJSONObject("payload");
+
+        if (CommonConstants.ACTION_LOCATION_UPDATE.equals(actionType))
+        {
+            final JSONArray location = payloadObject.getJSONArray("loc");
+
+
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    if (null != TakerActivity.this.makerMarker) {
+                        TakerActivity.this.makerMarker.remove();
+                    }
+
+                    try {
+                        TakerActivity.this.addMakerMarker(location.getDouble(0), location.getDouble(1));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+
+        return true;
+    }
+
 
     @Override
     protected void onPause() {

@@ -15,7 +15,6 @@ public class CommonConstants
     public static final String WITHDRAWAL_ID = "_id";
     public static final String WITHDRAWAL = "withdrawal";
 
-    public static final String ACTION_START = "ACTION_START";
-    public static final String ACTION_LOCATION_UPDATE = "ACTION_LOCATION_UPDATE";
+    public static final String ACTION_LOCATION_UPDATE = "notification";
     public static final String ACTION_END = "ACTION_END";
 }
