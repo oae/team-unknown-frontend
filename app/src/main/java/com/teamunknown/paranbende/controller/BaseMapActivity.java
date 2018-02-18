@@ -1,4 +1,4 @@
-package com.teamunknown.paranbende;
+package com.teamunknown.paranbende.controller;
 
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
@@ -32,13 +32,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.teamunknown.paranbende.R;
+import com.teamunknown.paranbende.RestInterfaceController;
 import com.teamunknown.paranbende.constants.CommonConstants;
 import com.teamunknown.paranbende.constants.MapConstants;
-import com.teamunknown.paranbende.controller.MakerActivity;
 import com.teamunknown.paranbende.helpers.MapHelper;
 import com.teamunknown.paranbende.helpers.RequestHelper;
 import com.teamunknown.paranbende.model.User;
-import com.teamunknown.paranbende.util.Helper;
 import com.teamunknown.paranbende.util.PreferencesPB;
 
 import org.json.JSONException;
