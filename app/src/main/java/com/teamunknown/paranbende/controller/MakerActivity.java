@@ -36,9 +36,7 @@ import com.teamunknown.paranbende.model.Settings.SettingsModel;
 import com.teamunknown.paranbende.model.Settings.UserSettings.UserSettingsData;
 import com.teamunknown.paranbende.model.Settings.UserSettings.UserSettingsMaker;
 import com.teamunknown.paranbende.model.Settings.UserSettings.UserSettingsModel;
-import com.teamunknown.paranbende.model.WithdrawalDataModel;
-import com.teamunknown.paranbende.model.WithdrawalModel;
-import com.teamunknown.paranbende.model.WithdrawalTakerModel;
+import com.teamunknown.paranbende.model.ToggleOnlineModel;
 import com.teamunknown.paranbende.util.Helper;
 import com.teamunknown.paranbende.util.PreferencesPB;
 
@@ -51,9 +49,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
+
 
 public class MakerActivity extends BaseMapActivity {
     // Keys for storing activity state.
@@ -65,6 +61,7 @@ public class MakerActivity extends BaseMapActivity {
     private SettingsDataModel mSettingsDataModel;
     private SettingsMaker mSettingsMaker;
     private SettingsModel mSettingsModel;
+    private ToggleOnlineModel mToggleOnlineModel;
     private UserSettingsModel mUserSettingsModel;
     private UserSettingsMaker mUserSettingsMaker;
     private UserSettingsData mUserSettingsData;
@@ -133,14 +130,13 @@ public class MakerActivity extends BaseMapActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                 TextView tIsOnline = findViewById(R.id.tIsOnline);
-                TextView tIsOffline = findViewById(R.id.tIsOffline);
-
+                updateToogleOnline(isChecked);
                 if (isChecked) {
-                    tIsOffline.setVisibility(View.GONE);
-                    tIsOnline.setVisibility(View.VISIBLE);
+                    tIsOnline.setTextColor(getColor(R.color.white));
+                    tIsOnline.setText(R.string.online);
                 } else {
-                    tIsOffline.setVisibility(View.VISIBLE);
-                    tIsOnline.setVisibility(View.GONE);
+                    tIsOnline.setTextColor(getColor(R.color.black));
+                    tIsOnline.setText(R.string.offline);
                 }
             }
         });
@@ -155,8 +151,59 @@ public class MakerActivity extends BaseMapActivity {
             String withdrawalId = getIntent().getExtras().getString(CommonConstants.WITHDRAWAL);
 
             createWitdrawEventDialog(message, withdrawalId);
+
+        if (CommonConstants.FROM_PUSH_NOTIFICATION.equals(whereFrom)) {
+            String message = getIntent().getExtras().getString("message");
+            createWithDrawEventDialog(message);
         }
     }
+
+    private void updateToogleOnline(boolean isChecked) {
+        serviceAPI = RequestHelper.createServiceAPI();
+
+        try {
+            JSONObject json = new JSONObject();
+            json.put("online", isChecked);
+            requestBody = json;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e(TAG, "JSON Exception");
+        }
+
+        retrofit2.Call<ToggleOnlineModel> call = serviceAPI.toogleOnline("Bearer " + PreferencesPB.getValue(GeneralValues.LOGIN_ACCESS_TOKEN), requestBody.toString());
+        call.enqueue(new Callback<ToggleOnlineModel>() {
+            @Override
+            public void onResponse(Call<ToggleOnlineModel> call, Response<ToggleOnlineModel> response) {
+                try {
+                    int code = response.code();
+                    mToggleOnlineModel = new ToggleOnlineModel();
+
+                    if (code == 200) {
+                        if (!(response.body() == null)) {
+                            mToggleOnlineModel.setError(response.body().getError());
+
+                            if (!mSettingsModel.getError()) {
+
+                                Helper.createSnackbar(MakerActivity.this, getString(R.string.isOnlineChanged));
+
+                            } else {
+                                Helper.createSnackbar(MakerActivity.this, response.body().getMessage());
+                            }
+                        }
+                    }
+
+                } catch (Exception e) {
+                    Log.e(TAG, "Response body is null");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ToggleOnlineModel> call, Throwable t) {
+            }
+        });
+
+    }
+
 
     private void saveSettings() {
 
@@ -205,12 +252,14 @@ public class MakerActivity extends BaseMapActivity {
 
                 } catch (Exception e) {
                     Log.e(TAG, "Response body is null");
+                    progressDialog.cancel();
                 }
             }
 
             @Override
             public void onFailure(Call<SettingsModel> call, Throwable t) {
                 Log.e(TAG, "onFailure()");
+                progressDialog.cancel();
             }
         });
 
@@ -246,6 +295,7 @@ public class MakerActivity extends BaseMapActivity {
                                 mMinAmountEditText.setText(String.valueOf(mUserSettingsMaker.getMinAmount()));
                                 mMaxAmountEditText.setText(String.valueOf(mUserSettingsMaker.getMaxAmount()));
                                 mDistanceEditText.setText(String.valueOf(mUserSettingsMaker.getRange()));
+                                sIsOnline.setChecked(mUserSettingsMaker.getOnline());
                             } else {
                                 Helper.createSnackbar(MakerActivity.this, response.body().getMessage());
                             }
@@ -262,6 +312,7 @@ public class MakerActivity extends BaseMapActivity {
 
             @Override
             public void onFailure(Call<UserSettingsModel> call, Throwable t) {
+                progressDialog.cancel();
 
             }
         });
@@ -294,7 +345,7 @@ public class MakerActivity extends BaseMapActivity {
         }
     }
 
-    private void createWitdrawEventDialog(String message, final String withdrawalId)
+    private void createWithDrawEventDialog(String message)
     {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MakerActivity.this);
         dialogBuilder.setTitle("Yeni bir işlem için onayınız bekleniyor!");
