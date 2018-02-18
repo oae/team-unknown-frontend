@@ -87,8 +87,8 @@ public class MakerActivity extends BaseMapActivity {
     private JSONObject requestBody;
 
     private Switch sIsOnline;
-    public EditText mMinAmountEditText, mMaxAmountEditText, mDistanceEditText;
-    private TextView mLogOutText;
+    private EditText mMinAmountEditText, mMaxAmountEditText, mDistanceEditText;
+    private TextView mLogOutText, mUserNameTextView;
 
     private ImageView avatar;
 
@@ -106,11 +106,8 @@ public class MakerActivity extends BaseMapActivity {
         if (getIntent() != null && getIntent().getExtras() != null) {
             whereFrom = getIntent().getExtras().getString(CommonConstants.WHERE_FROM);
         }
-        NavigationView navigationView=findViewById(R.id.nav_view);
-        View headerView = LayoutInflater.from(this).inflate(R.layout.nav_header_maker, navigationView, false);
 
-        avatar = headerView.findViewById(R.id.headerImage);
-        avatar.setBackground(getDrawable(R.drawable.app_logo));
+        avatar = findViewById(R.id.headerImage);
 
         setMapFragment();
         setMyLocationButton();
@@ -165,6 +162,8 @@ public class MakerActivity extends BaseMapActivity {
         mMinAmountEditText = findViewById(R.id.e_min_amount);
         mMaxAmountEditText = findViewById(R.id.e_max_amount);
         mDistanceEditText = findViewById(R.id.e_distance);
+        mUserNameTextView = findViewById(R.id.t_username);
+
         mLogOutText = findViewById(R.id.logOut);
 
         mLogOutText.setOnClickListener(new View.OnClickListener() {
@@ -333,8 +332,11 @@ public class MakerActivity extends BaseMapActivity {
                                 mMinAmountEditText.setText(String.valueOf(mUserSettingsMaker.getMinAmount()));
                                 mMaxAmountEditText.setText(String.valueOf(mUserSettingsMaker.getMaxAmount()));
                                 mDistanceEditText.setText(String.valueOf(mUserSettingsMaker.getRange()));
-                                Picasso.with(MakerActivity.this).load(mUserSettingsData.getAvatar()).into(avatar);
+                                Picasso.with(MakerActivity.this).load("http:" + mUserSettingsData.getAvatar()).into(avatar);
                                 toolbar.setNavigationIcon(R.drawable.ic_man_money);
+
+                                mUserNameTextView.setText(mUserSettingsModel.getData().getEmail());
+
                                 sIsOnline.setChecked(mUserSettingsMaker.getOnline());
                             } else {
                                 Helper.createSnackbar(MakerActivity.this, response.body().getMessage());
