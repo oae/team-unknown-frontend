@@ -133,7 +133,7 @@ public class MakerActivity extends BaseMapActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                 TextView tIsOnline = findViewById(R.id.tIsOnline);
-                updateToogleOnline(isChecked);
+                updateToggleOnline(isChecked);
                 if (isChecked) {
                     tIsOnline.setTextColor(getColor(R.color.white));
                     tIsOnline.setText(R.string.online);
@@ -176,7 +176,7 @@ public class MakerActivity extends BaseMapActivity {
         startActivity(intent);
     }
 
-    private void updateToogleOnline(boolean isChecked) {
+    private void updateToggleOnline(boolean isChecked) {
         serviceAPI = RequestHelper.createServiceAPI();
 
         try {
