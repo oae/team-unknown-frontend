@@ -52,6 +52,9 @@
     <string name="searching">Searching..</string>
     <string name="cancel">Cancel</string>
     <string name="save_settings">Settings is saved</string>
+    <string name="isOnlineChanged">Online status has been changed.</string>
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
 
 
 </resources>

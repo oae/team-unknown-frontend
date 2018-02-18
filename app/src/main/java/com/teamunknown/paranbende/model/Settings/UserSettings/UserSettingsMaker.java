@@ -20,6 +20,9 @@ public class UserSettingsMaker {
     @SerializedName("range")
     @Expose
     private Integer range;
+    @SerializedName("online")
+    @Expose
+    private Boolean online;
 
     public String getId() {
         return id;
@@ -51,5 +54,14 @@ public class UserSettingsMaker {
 
     public void setRange(Integer range) {
         this.range = range;
+    }
+
+
+    public Boolean getOnline() {
+        return online;
+    }
+
+    public void setOnline(Boolean online) {
+        this.online = online;
     }
 }
