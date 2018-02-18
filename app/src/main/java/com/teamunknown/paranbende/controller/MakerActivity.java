@@ -110,7 +110,6 @@ public class MakerActivity extends BaseMapActivity {
         View headerView = LayoutInflater.from(this).inflate(R.layout.nav_header_maker, navigationView, false);
 
         avatar = headerView.findViewById(R.id.headerImage);
-        avatar.setBackground(getDrawable(R.drawable.app_logo));
 
 
 
