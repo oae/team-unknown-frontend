@@ -385,11 +385,9 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
 
     protected void addMakerMarker(double lat, double lng)
     {
-        Log.i("lat", lat + "");
-        Log.i("lng", lng + "");
         makerMarker = mMap.addMarker(
                 new MarkerOptions()
-                        .icon(BitmapDescriptorFactory.fromBitmap(MapHelper.getMarkerBitmapFromView(BaseMapActivity.this, R.drawable.ic_men_web)))
+                        .icon(BitmapDescriptorFactory.fromBitmap(MapHelper.getMarkerBitmapFromView(BaseMapActivity.this, R.drawable.ic_man_money)))
                         .position(new LatLng(lat, lng)));
     }
 }
