@@ -37,6 +37,8 @@ import com.teamunknown.paranbende.model.Settings.UserSettings.UserSettingsData;
 import com.teamunknown.paranbende.model.Settings.UserSettings.UserSettingsMaker;
 import com.teamunknown.paranbende.model.Settings.UserSettings.UserSettingsModel;
 import com.teamunknown.paranbende.model.ToggleOnlineModel;
+import com.teamunknown.paranbende.model.WithdrawalDataModel;
+import com.teamunknown.paranbende.model.WithdrawalModel;
 import com.teamunknown.paranbende.util.Helper;
 import com.teamunknown.paranbende.util.PreferencesPB;
 
@@ -150,11 +152,7 @@ public class MakerActivity extends BaseMapActivity {
             String message = getIntent().getExtras().getString(CommonConstants.MESSAGE);
             String withdrawalId = getIntent().getExtras().getString(CommonConstants.WITHDRAWAL);
 
-            createWitdrawEventDialog(message, withdrawalId);
-
-        if (CommonConstants.FROM_PUSH_NOTIFICATION.equals(whereFrom)) {
-            String message = getIntent().getExtras().getString("message");
-            createWithDrawEventDialog(message);
+            createWithDrawEventDialog(message, withdrawalId);
         }
     }
 
@@ -345,7 +343,7 @@ public class MakerActivity extends BaseMapActivity {
         }
     }
 
-    private void createWithDrawEventDialog(String message)
+    private void createWithDrawEventDialog(String message, final String withdrawalId)
     {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MakerActivity.this);
         dialogBuilder.setTitle("Yeni bir işlem için onayınız bekleniyor!");
@@ -547,7 +545,7 @@ public class MakerActivity extends BaseMapActivity {
             String message = intent.getExtras().getString(CommonConstants.MESSAGE);
             String withdrawalId = intent.getExtras().getString(CommonConstants.WITHDRAWAL);
 
-            createWitdrawEventDialog(message, withdrawalId);
+            createWithDrawEventDialog(message, withdrawalId);
         }
     };
 
