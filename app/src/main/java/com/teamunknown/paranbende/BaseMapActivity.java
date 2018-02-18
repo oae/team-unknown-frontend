@@ -1,6 +1,7 @@
 package com.teamunknown.paranbende;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -35,9 +36,25 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.teamunknown.paranbende.constants.GeneralValues;
 import com.teamunknown.paranbende.constants.MapConstants;
 import com.teamunknown.paranbende.controller.MakerActivity;
+import com.teamunknown.paranbende.controller.TakerActivity;
 import com.teamunknown.paranbende.helpers.MapHelper;
+import com.teamunknown.paranbende.helpers.RequestHelper;
+import com.teamunknown.paranbende.model.User;
+import com.teamunknown.paranbende.model.WithdrawalDataModel;
+import com.teamunknown.paranbende.model.WithdrawalModel;
+import com.teamunknown.paranbende.model.WithdrawalTakerModel;
+import com.teamunknown.paranbende.util.Helper;
+import com.teamunknown.paranbende.util.PreferencesPB;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by msalihkarakasli on 17.02.2018.
@@ -157,7 +174,55 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
         getLocationPermission();
         updateLocationUI();
         getDeviceLocation();
+    }
 
+    private void createLocationUpdateRequest()
+    {
+        RestInterfaceController serviceAPI = RequestHelper.createServiceAPI();
+        JSONObject requestBody = null;
+
+        try
+        {
+            JSONObject json = new JSONObject();
+            json.put("lat", mLastKnownLocation.getLatitude());
+            json.put("lng", mLastKnownLocation.getLongitude());
+
+            JSONObject jsonObj = new JSONObject();
+            jsonObj.put("location", json);
+
+            requestBody = jsonObj;
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+            Log.e(TAG, "JSON Exception");
+        }
+
+        retrofit2.Call<User> call = serviceAPI.updateLocation("Bearer " + PreferencesPB.getValue(GeneralValues.LOGIN_ACCESS_TOKEN), requestBody.toString());
+
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                try {
+                    int code = response.code();
+
+                    if (code == 200) {
+                        if (!(response.body() == null))
+                        {
+                            Log.d("paranbende", response.toString());
+                        }
+                    }
+
+                } catch (Exception e) {
+                    Log.e(TAG, "Response body is null");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+
+            }
+        });
     }
 
     protected void getDeviceLocation() {
@@ -179,6 +244,9 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
                             currentMarker = mMap.addMarker(new MarkerOptions()
                                     .icon(BitmapDescriptorFactory.fromBitmap(MapHelper.getMarkerBitmapFromView(BaseMapActivity.this, R.drawable.ic_men_web)))
                                     .position(new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude())));
+
+                            createLocationUpdateRequest();
+
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());

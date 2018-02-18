@@ -3,6 +3,7 @@ package com.teamunknown.paranbende;
 import com.teamunknown.paranbende.model.Settings.SettingsModel;
 import com.teamunknown.paranbende.model.Settings.UserSettings.UserSettingsModel;
 import com.teamunknown.paranbende.model.ToggleOnlineModel;
+import com.teamunknown.paranbende.model.User;
 import com.teamunknown.paranbende.model.UserLoginModel;
 import com.teamunknown.paranbende.model.WithdrawalModel;
 
@@ -55,6 +56,10 @@ public interface RestInterfaceController {
 
 
 
+    /* confirm withdrawal */
+    @Headers("Content-Type: application/json")
+    @POST("/user/update-location")
+    Call<User> updateLocation(@Header("Authorization") String authorization, @Body String body);
 
 
 

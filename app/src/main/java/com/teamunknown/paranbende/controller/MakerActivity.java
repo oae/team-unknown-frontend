@@ -403,6 +403,9 @@ public class MakerActivity extends BaseMapActivity {
             public void onResponse(Call<WithdrawalModel> call, Response<WithdrawalModel> response) {
                 try {
                     int code = response.code();
+
+                    progressDialog.cancel();
+
                     mWithdrawalModel = new WithdrawalModel();
                     mWithdrawalDataModel = new WithdrawalDataModel();
 
@@ -412,6 +415,7 @@ public class MakerActivity extends BaseMapActivity {
 
                             if (!mWithdrawalModel.getError()) {
 
+                                mWithdrawalModel.setData(response.body().getData());
                                 mWithdrawalDataModel = mWithdrawalModel.getData();
                                 updateUIForTakerInformation();
 
@@ -438,7 +442,7 @@ public class MakerActivity extends BaseMapActivity {
     private void updateUIForTakerInformation()
     {
         List<Double> takerLocation = mWithdrawalDataModel.getTakerLocation();
-        addTakerMarker(takerLocation.get(0), takerLocation.get(1));
+        addTakerMarker(takerLocation.get(1), takerLocation.get(0));
     }
 
     private void connectWebSocket()
