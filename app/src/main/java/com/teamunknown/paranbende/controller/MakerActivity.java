@@ -111,8 +111,6 @@ public class MakerActivity extends BaseMapActivity {
 
         avatar = headerView.findViewById(R.id.headerImage);
 
-
-
         setMapFragment();
         setMyLocationButton();
 
