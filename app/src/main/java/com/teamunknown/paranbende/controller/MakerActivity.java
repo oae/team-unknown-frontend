@@ -110,7 +110,6 @@ public class MakerActivity extends BaseMapActivity {
             public void onClick(View view) {
                 if (!drawer.isDrawerOpen(GravityCompat.START)) {
                     drawer.openDrawer(GravityCompat.START);
-                    getUserSettings();
                 }
             }
         });
@@ -123,6 +122,7 @@ public class MakerActivity extends BaseMapActivity {
                 if (view.getId() == R.id.b_settings_ok) {
                     drawer.closeDrawer(GravityCompat.START);
                     saveSettings();
+                    getUserSettings();
                 }
             }
         });
@@ -164,6 +164,7 @@ public class MakerActivity extends BaseMapActivity {
             createWitdrawEventDialog(message, withdrawalId);
 
         }
+        getUserSettings();
     }
 
     private void logOut() {
