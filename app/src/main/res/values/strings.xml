@@ -56,6 +56,8 @@
     <string name="online">Online</string>
     <string name="offline">Offline</string>
     <string name="chooseUserType">Choose User Type:</string>
+    <string name="amountMoney">How much money do you need ?</string>
+    <string name="logOut">Log Out</string>
 
 
 </resources>

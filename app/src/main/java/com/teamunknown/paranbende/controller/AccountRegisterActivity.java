@@ -47,6 +47,7 @@ public class AccountRegisterActivity extends AppCompatActivity {
     View focusView = null;
     private RestInterfaceController serviceAPI;
     private String mUserEmailStr, mUserPasswordStr, mUserConfirmationPasswordStr;
+
     private JSONObject requestBody;
 
     private UserLoginModel mUserLoginModel;

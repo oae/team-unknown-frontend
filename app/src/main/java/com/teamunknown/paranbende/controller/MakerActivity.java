@@ -78,6 +78,7 @@ public class MakerActivity extends BaseMapActivity {
 
     private Switch sIsOnline;
     public EditText mMinAmountEditText, mMaxAmountEditText, mDistanceEditText;
+    private TextView mLogOutText;
 
 
     @Override
@@ -146,14 +147,33 @@ public class MakerActivity extends BaseMapActivity {
         mMinAmountEditText = findViewById(R.id.e_min_amount);
         mMaxAmountEditText = findViewById(R.id.e_max_amount);
         mDistanceEditText = findViewById(R.id.e_distance);
+        mLogOutText = findViewById(R.id.logOut);
+
+        mLogOutText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                logOut();
+            }
+        });
 
         if (CommonConstants.FROM_PUSH_NOTIFICATION.equals(whereFrom))
         {
             String message = getIntent().getExtras().getString(CommonConstants.MESSAGE);
             String withdrawalId = getIntent().getExtras().getString(CommonConstants.WITHDRAWAL);
 
-            createWithDrawEventDialog(message, withdrawalId);
+            createWitdrawEventDialog(message, withdrawalId);
+
         }
+    }
+
+    private void logOut() {
+        PreferencesPB.removeValue(GeneralValues.LOGIN_USER_TYPE);
+        PreferencesPB.removeValue(GeneralValues.LOGIN_ACCESS_TOKEN);
+        PreferencesPB.removeValue(GeneralValues.LOGIN_USER_ID);
+        PreferencesPB.removeValue(GeneralValues.LOGIN_USER_NAME);
+
+        Intent intent = new Intent(MakerActivity.this,LoginActivity.class);
+        startActivity(intent);
     }
 
     private void updateToogleOnline(boolean isChecked) {
@@ -343,7 +363,7 @@ public class MakerActivity extends BaseMapActivity {
         }
     }
 
-    private void createWithDrawEventDialog(String message, final String withdrawalId)
+    private void createWitdrawEventDialog(String message,final String withdrawalId)
     {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MakerActivity.this);
         dialogBuilder.setTitle("Yeni bir işlem için onayınız bekleniyor!");
