@@ -15,9 +15,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.teamunknown.paranbende.constants.GeneralValues;
+import com.teamunknown.paranbende.constants.CommonConstants;
 import com.teamunknown.paranbende.R;
 import com.teamunknown.paranbende.RestInterfaceController;
+import com.teamunknown.paranbende.helpers.RequestHelper;
 import com.teamunknown.paranbende.model.UserLoginModel;
 import com.teamunknown.paranbende.util.Helper;
 
@@ -101,13 +102,7 @@ public class AccountRegisterActivity extends AppCompatActivity {
     }
 
     private void signUp() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(GeneralValues.BASE_URL)
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        serviceAPI = retrofit.create(RestInterfaceController.class);
+        serviceAPI = RequestHelper.createServiceAPI();
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.loading));
@@ -121,7 +116,7 @@ public class AccountRegisterActivity extends AppCompatActivity {
             requestBody = json;
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(TAG, "JSON Exception");
+            Log.e(TAG, e.getMessage());
         }
 
         Call<UserLoginModel> call = serviceAPI.userRegister(requestBody.toString());
@@ -145,21 +140,25 @@ public class AccountRegisterActivity extends AppCompatActivity {
 
                             } else {
                                 Helper.createSnackbar(AccountRegisterActivity.this, response.body().getMessage());
+                                Log.i(TAG,"UserLoginModel getError()");
                             }
                             progressDialog.cancel();
 
                         } else {
                             Helper.createAlertDialog(AccountRegisterActivity.this, getString(R.string.something_going_wrong), false);
+                            Log.i(TAG,"Response body is null");
                         }
 
                         progressDialog.cancel();
                     } else {
                         progressDialog.cancel();
                         Helper.createSnackbar(AccountRegisterActivity.this, getString(R.string.internet_connection_problem));
+                        Log.i(TAG,"Response code !=200");
                     }
                 } catch (Exception e) {
                     progressDialog.cancel();
                     Helper.createSnackbar(AccountRegisterActivity.this, getString(R.string.something_going_wrong));
+                    Log.e(TAG,e.getMessage());
                     e.printStackTrace();
                 }
 
@@ -169,6 +168,7 @@ public class AccountRegisterActivity extends AppCompatActivity {
             public void onFailure(Call<UserLoginModel> call, Throwable t) {
                 progressDialog.cancel();
                 Helper.createSnackbar(AccountRegisterActivity.this, getString(R.string.internet_connection_problem));
+                Log.e(TAG,t.getMessage());
             }
         });
 

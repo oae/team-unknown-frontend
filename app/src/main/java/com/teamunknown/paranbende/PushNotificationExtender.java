@@ -7,7 +7,6 @@ import com.onesignal.NotificationExtenderService;
 import com.onesignal.OSNotificationReceivedResult;
 
 import com.teamunknown.paranbende.constants.CommonConstants;
-import com.teamunknown.paranbende.constants.GeneralValues;
 import com.teamunknown.paranbende.util.PreferencesPB;
 
 import org.json.JSONException;
@@ -22,7 +21,7 @@ public class PushNotificationExtender extends NotificationExtenderService
     @Override
     protected boolean onNotificationProcessing(OSNotificationReceivedResult receivedResult)
     {
-        String userId = PreferencesPB.getValue(GeneralValues.LOGIN_USER_ID);
+        String userId = PreferencesPB.getValue(CommonConstants.GeneralValues.LOGIN_USER_ID);
         try
         {
             if(userId.equals(receivedResult.payload.additionalData.getString("userId")))
@@ -31,7 +30,7 @@ public class PushNotificationExtender extends NotificationExtenderService
 
                 if (receivedResult.isAppInFocus)
                 {
-                    String userType = PreferencesPB.getValue(GeneralValues.LOGIN_USER_TYPE);
+                    String userType = PreferencesPB.getValue(CommonConstants.GeneralValues.LOGIN_USER_TYPE);
                     Intent intent;
                     if ("Maker".equals(userType)) {
                         intent = new Intent(CommonConstants.WITHDRAW_MATCH_EVENT);

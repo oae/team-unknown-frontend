@@ -28,7 +28,6 @@ import com.teamunknown.paranbende.BaseMapActivity;
 import com.teamunknown.paranbende.R;
 import com.teamunknown.paranbende.RestInterfaceController;
 import com.teamunknown.paranbende.constants.CommonConstants;
-import com.teamunknown.paranbende.constants.GeneralValues;
 import com.teamunknown.paranbende.helpers.RequestHelper;
 import com.teamunknown.paranbende.model.Settings.SettingsDataModel;
 import com.teamunknown.paranbende.model.Settings.SettingsMaker;
@@ -54,6 +53,9 @@ import retrofit2.Response;
 
 
 public class MakerActivity extends BaseMapActivity {
+
+    private static final String TAG = MakerActivity.class.getSimpleName();
+
     // Keys for storing activity state.
     DrawerLayout drawer;
     private Toolbar toolbar;
@@ -156,8 +158,7 @@ public class MakerActivity extends BaseMapActivity {
             }
         });
 
-        if (CommonConstants.FROM_PUSH_NOTIFICATION.equals(whereFrom))
-        {
+        if (CommonConstants.FROM_PUSH_NOTIFICATION.equals(whereFrom)) {
             String message = getIntent().getExtras().getString(CommonConstants.MESSAGE);
             String withdrawalId = getIntent().getExtras().getString(CommonConstants.WITHDRAWAL);
 
@@ -168,12 +169,12 @@ public class MakerActivity extends BaseMapActivity {
     }
 
     private void logOut() {
-        PreferencesPB.removeValue(GeneralValues.LOGIN_USER_TYPE);
-        PreferencesPB.removeValue(GeneralValues.LOGIN_ACCESS_TOKEN);
-        PreferencesPB.removeValue(GeneralValues.LOGIN_USER_ID);
-        PreferencesPB.removeValue(GeneralValues.LOGIN_USER_NAME);
+        PreferencesPB.removeValue(CommonConstants.GeneralValues.LOGIN_USER_TYPE);
+        PreferencesPB.removeValue(CommonConstants.GeneralValues.LOGIN_ACCESS_TOKEN);
+        PreferencesPB.removeValue(CommonConstants.GeneralValues.LOGIN_USER_ID);
+        PreferencesPB.removeValue(CommonConstants.GeneralValues.LOGIN_USER_NAME);
 
-        Intent intent = new Intent(MakerActivity.this,LoginActivity.class);
+        Intent intent = new Intent(MakerActivity.this, LoginActivity.class);
         startActivity(intent);
     }
 
@@ -186,10 +187,10 @@ public class MakerActivity extends BaseMapActivity {
             requestBody = json;
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(TAG, "JSON Exception");
+            Log.e(TAG, e.getMessage());
         }
 
-        retrofit2.Call<ToggleOnlineModel> call = serviceAPI.toogleOnline("Bearer " + PreferencesPB.getValue(GeneralValues.LOGIN_ACCESS_TOKEN), requestBody.toString());
+        retrofit2.Call<ToggleOnlineModel> call = serviceAPI.toogleOnline("Bearer " + PreferencesPB.getValue(CommonConstants.GeneralValues.LOGIN_ACCESS_TOKEN), requestBody.toString());
         call.enqueue(new Callback<ToggleOnlineModel>() {
             @Override
             public void onResponse(Call<ToggleOnlineModel> call, Response<ToggleOnlineModel> response) {
@@ -207,17 +208,19 @@ public class MakerActivity extends BaseMapActivity {
 
                             } else {
                                 Helper.createSnackbar(MakerActivity.this, response.body().getMessage());
+                                Log.i(TAG, "SettingsModel getError()");
                             }
                         }
                     }
 
                 } catch (Exception e) {
-                    Log.e(TAG, "Response body is null");
+                    Log.e(TAG, e.getMessage());
                 }
             }
 
             @Override
             public void onFailure(Call<ToggleOnlineModel> call, Throwable t) {
+                Log.e(TAG, t.getMessage());
             }
         });
 
@@ -244,7 +247,7 @@ public class MakerActivity extends BaseMapActivity {
             Log.e(TAG, "JSON Exception");
         }
 
-        retrofit2.Call<SettingsModel> call = serviceAPI.saveUserSettings("Bearer " + PreferencesPB.getValue(GeneralValues.LOGIN_ACCESS_TOKEN), requestBody.toString());
+        retrofit2.Call<SettingsModel> call = serviceAPI.saveUserSettings("Bearer " + PreferencesPB.getValue(CommonConstants.GeneralValues.LOGIN_ACCESS_TOKEN), requestBody.toString());
         call.enqueue(new Callback<SettingsModel>() {
             @Override
             public void onResponse(Call<SettingsModel> call, Response<SettingsModel> response) {
@@ -264,20 +267,21 @@ public class MakerActivity extends BaseMapActivity {
 
                             } else {
                                 Helper.createSnackbar(MakerActivity.this, response.body().getMessage());
+                                Log.i(TAG, "SettingsModel getError()");
                             }
                             progressDialog.cancel();
                         }
                     }
 
                 } catch (Exception e) {
-                    Log.e(TAG, "Response body is null");
+                    Log.e(TAG, e.getMessage());
                     progressDialog.cancel();
                 }
             }
 
             @Override
             public void onFailure(Call<SettingsModel> call, Throwable t) {
-                Log.e(TAG, "onFailure()");
+                Log.e(TAG, t.getMessage());
                 progressDialog.cancel();
             }
         });
@@ -293,7 +297,7 @@ public class MakerActivity extends BaseMapActivity {
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        retrofit2.Call<UserSettingsModel> call = serviceAPI.getUserSettings("Bearer " + PreferencesPB.getValue(GeneralValues.LOGIN_ACCESS_TOKEN));
+        retrofit2.Call<UserSettingsModel> call = serviceAPI.getUserSettings("Bearer " + PreferencesPB.getValue(CommonConstants.GeneralValues.LOGIN_ACCESS_TOKEN));
         call.enqueue(new Callback<UserSettingsModel>() {
             @Override
             public void onResponse(Call<UserSettingsModel> call, Response<UserSettingsModel> response) {
@@ -310,13 +314,13 @@ public class MakerActivity extends BaseMapActivity {
                             mUserSettingsData = mUserSettingsModel.getData();
                             mUserSettingsMaker = mUserSettingsData.getMaker();
                             if (!mUserSettingsModel.getError()) {
-                                // Picasso.with(getApplicationContext()).load(mUserSettingsData.getAvatar()).into((Target) toolbar.getNavigationIcon());
                                 mMinAmountEditText.setText(String.valueOf(mUserSettingsMaker.getMinAmount()));
                                 mMaxAmountEditText.setText(String.valueOf(mUserSettingsMaker.getMaxAmount()));
                                 mDistanceEditText.setText(String.valueOf(mUserSettingsMaker.getRange()));
                                 sIsOnline.setChecked(mUserSettingsMaker.getOnline());
                             } else {
                                 Helper.createSnackbar(MakerActivity.this, response.body().getMessage());
+                                Log.i(TAG, "userSettingsModel getError()");
                             }
                             progressDialog.cancel();
 
@@ -324,7 +328,7 @@ public class MakerActivity extends BaseMapActivity {
                     }
 
                 } catch (Exception e) {
-                    Log.e(TAG, "Response body is null");
+                    Log.e(TAG, e.getMessage());
                     progressDialog.cancel();
                 }
             }
@@ -332,23 +336,19 @@ public class MakerActivity extends BaseMapActivity {
             @Override
             public void onFailure(Call<UserSettingsModel> call, Throwable t) {
                 progressDialog.cancel();
-
+                Log.e(TAG, t.getMessage());
             }
         });
 
     }
 
     @Override
-    protected void updateObjectsOnMap(double latitude,double longitude,int zoomLevel)
-    {
-        if (mWebSocket != null)
-        {
-            try
-            {
+    protected void updateObjectsOnMap(double latitude, double longitude, int zoomLevel) {
+        if (mWebSocket != null) {
+            try {
                 mWebSocket.send(createUpdateLocationMessage());
-            }
-            catch (JSONException e)
-            {
+            } catch (JSONException e) {
+                Log.e(TAG, e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -362,10 +362,11 @@ public class MakerActivity extends BaseMapActivity {
         } else {
             super.onBackPressed();
         }
+
+        Log.i(TAG, "onBackPressed()");
     }
 
-    private void createWithdrawEventDialog(String message,final String withdrawalId)
-    {
+    private void createWithdrawEventDialog(String message, final String withdrawalId) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MakerActivity.this);
         dialogBuilder.setTitle("We need your permission to keep going!");
         dialogBuilder.setMessage(message);
@@ -394,8 +395,7 @@ public class MakerActivity extends BaseMapActivity {
         dialogBox.show();
     }
 
-    private void createConfirmWithdrawalRequest(Boolean isApproved, String withdrawalId)
-    {
+    private void createConfirmWithdrawalRequest(Boolean isApproved, String withdrawalId) {
         serviceAPI = RequestHelper.createServiceAPI();
 
         progressDialog = new ProgressDialog(this);
@@ -403,20 +403,17 @@ public class MakerActivity extends BaseMapActivity {
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        try
-        {
+        try {
             JSONObject json = new JSONObject();
             json.put("isApproved", isApproved);
             json.put("withdrawalId", withdrawalId);
             requestBody = json;
-        }
-        catch (JSONException e)
-        {
+        } catch (JSONException e) {
             e.printStackTrace();
             Log.e(TAG, "JSON Exception");
         }
 
-        retrofit2.Call<WithdrawalModel> call = serviceAPI.confirmWithdrawal("Bearer " + PreferencesPB.getValue(GeneralValues.LOGIN_ACCESS_TOKEN), requestBody.toString());
+        retrofit2.Call<WithdrawalModel> call = serviceAPI.confirmWithdrawal("Bearer " + PreferencesPB.getValue(CommonConstants.GeneralValues.LOGIN_ACCESS_TOKEN), requestBody.toString());
         call.enqueue(new Callback<WithdrawalModel>() {
             @Override
             public void onResponse(Call<WithdrawalModel> call, Response<WithdrawalModel> response) {
@@ -440,32 +437,37 @@ public class MakerActivity extends BaseMapActivity {
 
                             } else {
                                 Helper.createSnackbar(MakerActivity.this, response.body().getMessage());
+                                Log.i(TAG, "WithDrawalModel getError()");
                             }
                             progressDialog.cancel();
                         }
                     }
 
                 } catch (Exception e) {
-                    Log.e(TAG, "Response body is null");
+                    Log.e(TAG, e.getMessage());
                 }
             }
 
             @Override
             public void onFailure(Call<WithdrawalModel> call, Throwable t) {
-                Log.e(TAG, "onFailure()");
+                Log.e(TAG, t.getMessage());
             }
         });
 
     }
 
-    private void updateUIForTakerInformation()
-    {
-        List<Double> takerLocation = mWithdrawalDataModel.getTakerLocation();
-        addTakerMarker(takerLocation.get(1), takerLocation.get(0));
+    private void updateUIForTakerInformation() {
+        try {
+            List<Double> takerLocation = mWithdrawalDataModel.getTakerLocation();
+            addTakerMarker(takerLocation.get(1), takerLocation.get(0));
+
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+
     }
 
-    private void connectWebSocket()
-    {
+    private void connectWebSocket() {
         AsyncHttpClient.getDefaultInstance().websocket("ws://lab.nepjua.org:23000", null, new AsyncHttpClient.WebSocketConnectCallback() {
             @Override
             public void onCompleted(Exception ex, WebSocket webSocket) {
@@ -476,23 +478,19 @@ public class MakerActivity extends BaseMapActivity {
 
                 mWebSocket = webSocket;
 
-                try
-                {
+                try {
                     webSocket.send(createUpdateLocationMessage());
-                }
-                catch (JSONException e)
-                {
+                } catch (JSONException e) {
                     e.printStackTrace();
+                    Log.e(TAG, e.getMessage());
                     return;
                 }
             }
         });
     }
 
-    private String createUpdateLocationMessage() throws JSONException
-    {
-        if (mLastKnownLocation == null)
-        {
+    private String createUpdateLocationMessage() throws JSONException {
+        if (mLastKnownLocation == null) {
             return createLocationUpdateErrorMessage();
         }
         JSONObject mainRequestObject = new JSONObject();
@@ -514,8 +512,7 @@ public class MakerActivity extends BaseMapActivity {
         return mainRequestObject.toString();
     }
 
-    private String createLocationUpdateErrorMessage() throws JSONException
-    {
+    private String createLocationUpdateErrorMessage() throws JSONException {
         JSONObject mainRequestObject = new JSONObject();
 
         mainRequestObject.put("type", "error");

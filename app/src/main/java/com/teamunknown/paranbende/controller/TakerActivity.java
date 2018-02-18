@@ -1,11 +1,9 @@
 package com.teamunknown.paranbende.controller;
 
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -20,7 +18,6 @@ import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.WebSocket;
 import com.teamunknown.paranbende.BaseMapActivity;
 import com.teamunknown.paranbende.constants.CommonConstants;
-import com.teamunknown.paranbende.constants.GeneralValues;
 import com.teamunknown.paranbende.R;
 import com.teamunknown.paranbende.RestInterfaceController;
 import com.teamunknown.paranbende.helpers.DialogHelper;
@@ -40,6 +37,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class TakerActivity extends BaseMapActivity implements View.OnClickListener {
+    private static final String TAG = TakerActivity.class.getSimpleName();
+
     EditText moneyAmountEditText;
     Button searchButton;
     private ProgressDialog progressDialog;
@@ -72,8 +71,7 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
     }
 
     @Override
-    protected void updateObjectsOnMap(double latitude, double longitude, int zoomLevel)
-    {
+    protected void updateObjectsOnMap(double latitude, double longitude, int zoomLevel) {
         return;
     }
 
@@ -90,9 +88,10 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        Log.i(TAG, "Map is ready.");
         getLocationPermission();
         getDeviceLocation();
+
     }
 
     @Override
@@ -104,11 +103,9 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
         }
     }
 
-    private JSONObject createWithdrawalRequestBody(int moneyAmount)
-    {
+    private JSONObject createWithdrawalRequestBody(int moneyAmount) {
         JSONObject json = null;
-        try
-        {
+        try {
             json = new JSONObject();
             json.put("amount", moneyAmount);
 
@@ -118,24 +115,21 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
 
             json.put("location", locationArray);
 
-        }
-        catch (JSONException e)
-        {
+        } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(TAG, "JSON Exception");
+            Log.e(TAG, e.getMessage());
         }
 
         return json;
     }
 
-    private void createWithdrawal(int moneyAmount)
-    {
+    private void createWithdrawal(int moneyAmount) {
         serviceAPI = RequestHelper.createServiceAPI();
         progressDialog = DialogHelper.show(this);
 
         requestBody = createWithdrawalRequestBody(moneyAmount);
 
-        retrofit2.Call<WithdrawalModel> call = serviceAPI.createWithdrawal("Bearer " + PreferencesPB.getValue(GeneralValues.LOGIN_ACCESS_TOKEN),
+        retrofit2.Call<WithdrawalModel> call = serviceAPI.createWithdrawal("Bearer " + PreferencesPB.getValue(CommonConstants.GeneralValues.LOGIN_ACCESS_TOKEN),
                 requestBody.toString());
 
         call.enqueue(new Callback<WithdrawalModel>() {
@@ -157,17 +151,19 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
                             } else {
                                 Helper.createSnackbar(TakerActivity.this, response.body().getMessage());
                                 progressDialog.cancel();
+                                Log.i(TAG, "WithdrawalModel getError()");
                             }
                         }
                     }
 
                 } catch (Exception e) {
-                    Log.e(TAG, "Response body is null");
+                    Log.e(TAG, e.getMessage());
                 }
             }
 
             @Override
             public void onFailure(Call<WithdrawalModel> call, Throwable t) {
+                Log.e(TAG, t.getMessage());
 
             }
         });
@@ -178,21 +174,21 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            progressDialog.cancel();
 
-            String message = intent.getExtras().getString(CommonConstants.MESSAGE);
             try {
+                progressDialog.cancel();
+
                 withdrawalObj = new JSONObject(intent.getExtras().getString(CommonConstants.WITHDRAWAL));
                 if ("cancelled".equals(withdrawalObj.getString("status"))) {
                     Helper.createSnackbar(TakerActivity.this, "Withdrawal request cancelled by maker.");
-                }
-                else if ("matched".equals(withdrawalObj.getString("status"))) {
+                } else if ("matched".equals(withdrawalObj.getString("status"))) {
                     Helper.createSnackbar(TakerActivity.this, "Maker is bringing your money.");
 
                     connectWebSocket();
 
                 }
             } catch (JSONException e) {
+                Log.e(TAG,e.getMessage());
                 e.printStackTrace();
             }
 
@@ -200,8 +196,7 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
         }
     };
 
-    private void connectWebSocket()
-    {
+    private void connectWebSocket() {
         AsyncHttpClient.getDefaultInstance().websocket("ws://lab.nepjua.org:23000", null, new AsyncHttpClient.WebSocketConnectCallback() {
             @Override
             public void onCompleted(Exception ex, WebSocket webSocket) {
@@ -212,8 +207,7 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
 
                 mWebSocket = webSocket;
 
-                try
-                {
+                try {
                     webSocket.send(subscriptionMessage());
                     webSocket.setStringCallback(new WebSocket.StringCallback() {
                         public void onStringAvailable(String s) {
@@ -224,9 +218,8 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
                             }
                         }
                     });
-                }
-                catch (JSONException e)
-                {
+                } catch (JSONException e) {
+                    Log.e(TAG,e.getMessage());
                     e.printStackTrace();
                     return;
                 }
@@ -234,10 +227,8 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
         });
     }
 
-    private String subscriptionMessage() throws JSONException
-    {
-        if (mLastKnownLocation == null)
-        {
+    private String subscriptionMessage() throws JSONException {
+        if (mLastKnownLocation == null) {
             return subscriptionMessageError();
         }
         JSONObject mainRequestObject = new JSONObject();
@@ -253,8 +244,7 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
         return mainRequestObject.toString();
     }
 
-    private String subscriptionMessageError() throws JSONException
-    {
+    private String subscriptionMessageError() throws JSONException {
         JSONObject mainRequestObject = new JSONObject();
 
         mainRequestObject.put("type", "error");
@@ -267,10 +257,8 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
         return mainRequestObject.toString();
     }
 
-    private boolean parseSocketMessage(String s) throws JSONException
-    {
-        if ("".equals(s))
-        {
+    private boolean parseSocketMessage(String s) throws JSONException {
+        if ("".equals(s)) {
             return false;
         }
 
@@ -279,8 +267,7 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
         String actionType = mainObject.getString("type");
         JSONObject payloadObject = mainObject.getJSONObject("payload");
 
-        if (CommonConstants.ACTION_LOCATION_UPDATE.equals(actionType))
-        {
+        if (CommonConstants.ACTION_LOCATION_UPDATE.equals(actionType)) {
             final JSONArray location = payloadObject.getJSONArray("loc");
 
 
@@ -295,6 +282,7 @@ public class TakerActivity extends BaseMapActivity implements View.OnClickListen
                     try {
                         TakerActivity.this.addMakerMarker(location.getDouble(0), location.getDouble(1));
                     } catch (JSONException e) {
+                        Log.e(TAG,e.getMessage());
                         e.printStackTrace();
                     }
                 }

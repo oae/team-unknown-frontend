@@ -1,7 +1,7 @@
 package com.teamunknown.paranbende.helpers;
 
 import com.teamunknown.paranbende.RestInterfaceController;
-import com.teamunknown.paranbende.constants.GeneralValues;
+import com.teamunknown.paranbende.constants.CommonConstants;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -16,7 +16,7 @@ public class RequestHelper
     public static RestInterfaceController createServiceAPI()
     {
         Retrofit retrofitObj = new Retrofit.Builder()
-                    .baseUrl(GeneralValues.BASE_URL)
+                    .baseUrl(CommonConstants.GeneralValues.BASE_URL)
                     .addConverterFactory(ScalarsConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();

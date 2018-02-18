@@ -1,13 +1,9 @@
 package com.teamunknown.paranbende.controller;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -19,9 +15,10 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.teamunknown.paranbende.constants.GeneralValues;
+import com.teamunknown.paranbende.constants.CommonConstants;
 import com.teamunknown.paranbende.R;
 import com.teamunknown.paranbende.RestInterfaceController;
+import com.teamunknown.paranbende.helpers.RequestHelper;
 import com.teamunknown.paranbende.model.Data;
 import com.teamunknown.paranbende.model.User;
 import com.teamunknown.paranbende.model.UserLoginModel;
@@ -36,15 +33,13 @@ import java.util.List;
 
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
+
 
 /**
  * Created by halitogunc on 17.02.2018.
  */
 
-public class LoginActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
+public class LoginActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
 
@@ -69,7 +64,6 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     private JSONObject requestBody;
 
 
-    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
@@ -112,6 +106,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                 try {
                     attemptLogin();
                 } catch (JSONException e) {
+                    Log.e(TAG, e.getMessage());
                     e.printStackTrace();
                 }
             }
@@ -121,7 +116,6 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         mUserTypeSpinner.setAdapter(dataAdapter);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mUserTypeSpinner.setOnItemSelectedListener(this);
-
 
 
     }
@@ -137,13 +131,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     }
 
     private void logIn() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(GeneralValues.BASE_URL)
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        serviceAPI = retrofit.create(RestInterfaceController.class);
+        serviceAPI = RequestHelper.createServiceAPI();
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.loading));
@@ -156,7 +144,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
             requestBody = json;
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(TAG, "JSON Exception");
+            Log.e(TAG, e.getMessage());
         }
 
         retrofit2.Call<UserLoginModel> call = serviceAPI.userLogin(requestBody.toString());
@@ -179,18 +167,17 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                                 mUser.setEmail(mData.getUser().getEmail());
                                 mUser.setId(mData.getUser().getId());
 
-                                PreferencesPB.setValue(GeneralValues.LOGIN_USER_NAME, mUser.getEmail());
-                                PreferencesPB.setValue(GeneralValues.LOGIN_ACCESS_TOKEN, mData.getToken());
-                                PreferencesPB.setValue(GeneralValues.LOGIN_USER_ID, mUser.getId());
+                                PreferencesPB.setValue(CommonConstants.GeneralValues.LOGIN_USER_NAME, mUser.getEmail());
+                                PreferencesPB.setValue(CommonConstants.GeneralValues.LOGIN_ACCESS_TOKEN, mData.getToken());
+                                PreferencesPB.setValue(CommonConstants.GeneralValues.LOGIN_USER_ID, mUser.getId());
                                 Intent intent = null;
-                                if (PreferencesPB.checkPreferencesWhetherTheValueisExistorNot(GeneralValues.LOGIN_USER_TYPE)){
-                                    if (PreferencesPB.getValue(GeneralValues.LOGIN_USER_TYPE).equals("Taker")) {
+                                if (PreferencesPB.checkPreferencesWhetherTheValueisExistorNot(CommonConstants.GeneralValues.LOGIN_USER_TYPE)) {
+                                    if (PreferencesPB.getValue(CommonConstants.GeneralValues.LOGIN_USER_TYPE).equals("Taker")) {
                                         intent = new Intent(LoginActivity.this, TakerActivity.class);
                                     } else {
                                         intent = new Intent(LoginActivity.this, MakerActivity.class);
                                     }
-                                }
-                                else {
+                                } else {
                                     intent = new Intent(LoginActivity.this, TakerActivity.class);
                                 }
                                 startActivity(intent);
@@ -199,20 +186,24 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
                             } else {
                                 Helper.createSnackbar(LoginActivity.this, response.body().getMessage());
+                                Log.i(TAG, "UserLoginModel getError()");
                             }
 
                         } else {
                             Helper.createAlertDialog(LoginActivity.this, "Username or password is wrong.", false);
+                            Log.i(TAG, "UserResponseBody is null");
                         }
 
                         progressDialog.cancel();
                     } else {
                         progressDialog.cancel();
                         Helper.createSnackbar(LoginActivity.this, getString(R.string.internet_connection_problem));
+                        Log.i(TAG, "Response code !=200");
                     }
                 } catch (Exception e) {
                     progressDialog.cancel();
                     Helper.createSnackbar(LoginActivity.this, getString(R.string.something_going_wrong));
+                    Log.e(TAG, e.getMessage());
                     e.printStackTrace();
                 }
 
@@ -222,6 +213,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
             public void onFailure(retrofit2.Call<UserLoginModel> call, Throwable t) {
                 progressDialog.cancel();
                 Helper.createSnackbar(LoginActivity.this, getString(R.string.internet_connection_problem));
+                Log.e(TAG, t.getMessage());
             }
         });
 
@@ -262,13 +254,12 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
 
     private void checkUserLogInStatus() {
-        if (PreferencesPB.checkPreferencesWhetherTheValueisExistorNot(GeneralValues.LOGIN_USER_NAME)) {
+        if (PreferencesPB.checkPreferencesWhetherTheValueisExistorNot(CommonConstants.GeneralValues.LOGIN_USER_NAME)) {
             Intent intent;
-            if (PreferencesPB.checkPreferencesWhetherTheValueisExistorNot(GeneralValues.LOGIN_USER_TYPE) &&
-                    PreferencesPB.getValue(GeneralValues.LOGIN_USER_TYPE).equals("Maker")){
+            if (PreferencesPB.checkPreferencesWhetherTheValueisExistorNot(CommonConstants.GeneralValues.LOGIN_USER_TYPE) &&
+                    PreferencesPB.getValue(CommonConstants.GeneralValues.LOGIN_USER_TYPE).equals("Maker")) {
                 intent = new Intent(LoginActivity.this, MakerActivity.class);
-            }
-            else {
+            } else {
                 intent = new Intent(LoginActivity.this, TakerActivity.class);
             }
             LoginActivity.this.finish();
@@ -280,17 +271,10 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     }
 
 
-    private boolean isDeviceOnline() {
-
-        ConnectivityManager connectivityManager = (ConnectivityManager) LoginActivity.this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
-
-    }
-
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {
         selectedItem = parent.getItemAtPosition(position).toString();
-        PreferencesPB.setValue(GeneralValues.LOGIN_USER_TYPE, selectedItem);
+        PreferencesPB.setValue(CommonConstants.GeneralValues.LOGIN_USER_TYPE, selectedItem);
     }
 
     @Override

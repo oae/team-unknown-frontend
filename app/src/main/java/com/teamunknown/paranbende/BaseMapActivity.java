@@ -1,10 +1,8 @@
 package com.teamunknown.paranbende;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -20,11 +18,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -36,17 +32,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.teamunknown.paranbende.constants.GeneralValues;
+import com.teamunknown.paranbende.constants.CommonConstants;
 import com.teamunknown.paranbende.constants.MapConstants;
 import com.teamunknown.paranbende.controller.MakerActivity;
-import com.teamunknown.paranbende.controller.TakerActivity;
 import com.teamunknown.paranbende.helpers.MapHelper;
 import com.teamunknown.paranbende.helpers.RequestHelper;
 import com.teamunknown.paranbende.model.User;
-import com.teamunknown.paranbende.model.WithdrawalDataModel;
-import com.teamunknown.paranbende.model.WithdrawalModel;
-import com.teamunknown.paranbende.model.WithdrawalTakerModel;
-import com.teamunknown.paranbende.util.Helper;
 import com.teamunknown.paranbende.util.PreferencesPB;
 
 import org.json.JSONException;
@@ -199,7 +190,7 @@ public abstract class BaseMapActivity extends AppCompatActivity implements OnMap
             Log.e(TAG, "JSON Exception");
         }
 
-        retrofit2.Call<User> call = serviceAPI.updateLocation("Bearer " + PreferencesPB.getValue(GeneralValues.LOGIN_ACCESS_TOKEN), requestBody.toString());
+        retrofit2.Call<User> call = serviceAPI.updateLocation("Bearer " + PreferencesPB.getValue(CommonConstants.GeneralValues.LOGIN_ACCESS_TOKEN), requestBody.toString());
 
         call.enqueue(new Callback<User>() {
             @Override
