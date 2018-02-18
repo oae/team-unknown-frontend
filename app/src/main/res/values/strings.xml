@@ -55,6 +55,7 @@
     <string name="isOnlineChanged">Online status has been changed.</string>
     <string name="online">Online</string>
     <string name="offline">Offline</string>
+    <string name="chooseUserType">Choose User Type:</string>
 
 
 </resources>
