@@ -161,7 +161,7 @@ public class MakerActivity extends BaseMapActivity {
             String message = getIntent().getExtras().getString(CommonConstants.MESSAGE);
             String withdrawalId = getIntent().getExtras().getString(CommonConstants.WITHDRAWAL);
 
-            createWitdrawEventDialog(message, withdrawalId);
+            createWithdrawEventDialog(message, withdrawalId);
 
         }
         getUserSettings();
@@ -364,7 +364,7 @@ public class MakerActivity extends BaseMapActivity {
         }
     }
 
-    private void createWitdrawEventDialog(String message,final String withdrawalId)
+    private void createWithdrawEventDialog(String message,final String withdrawalId)
     {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MakerActivity.this);
         dialogBuilder.setTitle("We need your permission to keep going!");
@@ -534,7 +534,7 @@ public class MakerActivity extends BaseMapActivity {
             String message = intent.getExtras().getString(CommonConstants.MESSAGE);
             String withdrawalId = intent.getExtras().getString(CommonConstants.WITHDRAWAL);
 
-            createWithDrawEventDialog(message, withdrawalId);
+            createWithdrawEventDialog(message, withdrawalId);
         }
     };
 
