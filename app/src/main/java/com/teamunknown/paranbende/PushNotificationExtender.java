@@ -31,11 +31,22 @@ public class PushNotificationExtender extends NotificationExtenderService
 
                 if (receivedResult.isAppInFocus)
                 {
-                    Intent intent = new Intent(CommonConstants.WITHDRAW_MATCH_EVENT);
-                    intent.putExtra(CommonConstants.MESSAGE, receivedResult.payload.body);
-                    intent.putExtra(CommonConstants.WITHDRAWAL, withdrawObj.getString(CommonConstants.WITHDRAWAL_ID));
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                    String userType = PreferencesPB.getValue(GeneralValues.LOGIN_USER_TYPE);
+                    Intent intent;
+                    if ("Maker".equals(userType)) {
+                        intent = new Intent(CommonConstants.WITHDRAW_MATCH_EVENT);
 
+                        intent.putExtra(CommonConstants.WITHDRAWAL, withdrawObj.getString(CommonConstants.WITHDRAWAL_ID));
+                    }
+                    else {
+                        intent = new Intent(CommonConstants.TAKER_WITHDRAW_MATCH_EVENT);
+                        intent.putExtra(CommonConstants.WITHDRAWAL, withdrawObj.toString());
+
+                    }
+
+                    intent.putExtra(CommonConstants.MESSAGE, receivedResult.payload.body);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                    
                     return true;
                 }
 
